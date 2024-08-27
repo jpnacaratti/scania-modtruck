@@ -1,4 +1,4 @@
-package com.nacaratti.modtruck
+package com.jpnacaratti.modtruck
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

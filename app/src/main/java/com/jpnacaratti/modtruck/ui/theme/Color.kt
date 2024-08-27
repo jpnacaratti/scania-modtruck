@@ -1,4 +1,4 @@
-package com.nacaratti.modtruck.ui.theme
+package com.jpnacaratti.modtruck.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
