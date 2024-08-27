@@ -1,4 +1,4 @@
-package com.jpnacaratti.modtruck
+package com.jpnacaratti.modtruck.ui.activities
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,14 +11,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.nacaratti.modtruck.ui.theme.ScaniamodtruckTheme
+import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ScaniamodtruckTheme {
+            ModTruckTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
                         name = "Android",
@@ -41,7 +41,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    ScaniamodtruckTheme {
+    ModTruckTheme {
         Greeting("Android")
     }
 }
