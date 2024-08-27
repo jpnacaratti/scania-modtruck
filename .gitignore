@@ -1,0 +1,23 @@
+# IDE files
+*.iml
+/.idea/
+/.idea/caches/
+/.idea/libraries/
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+
+# Gradle files
+.gradle
+local.properties
+/local.properties
+
+# macOS specific files
+.DS_Store
+
+# Android build files
+/build/
+/captures/
+/externalNativeBuild
+/.cxx
