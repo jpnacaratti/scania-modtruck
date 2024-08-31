@@ -26,20 +26,17 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
-import com.jpnacaratti.modtruck.ui.theme.Gray
 
 @Composable
 fun Modifier.backgroundBlur(
     blurRadius: Int,
     shape: RoundedCornerShape,
     backgroundColor: Color,
-    backgroundColorAlpha: Float = 1f
+    backgroundColorAlpha: Float = 1f,
+    onBlurReady: () -> Unit = {}
 ): Modifier {
     var capturedBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     var layoutCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
@@ -91,6 +88,8 @@ fun Modifier.backgroundBlur(
                         color = backgroundColor.copy(alpha = backgroundColorAlpha),
                         size = size
                     )
+
+                    onBlurReady()
                 }
         )
     }
