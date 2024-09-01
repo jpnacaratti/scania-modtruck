@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -18,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,12 +29,15 @@ import androidx.compose.ui.unit.sp
 import com.jpnacaratti.modtruck.ui.theme.Gray
 import com.jpnacaratti.modtruck.ui.theme.LightDarkBlue
 import com.jpnacaratti.modtruck.ui.theme.LightGray
+import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
 import com.jpnacaratti.modtruck.ui.theme.White
+import com.jpnacaratti.modtruck.ui.viewmodels.AppUiState
+import com.jpnacaratti.modtruck.utils.GoogleFontProvider
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider.Companion.poppins
 import com.nacaratti.modtruck.R
 
 @Composable
-fun AboutTruckSection(truckColor: String, truckSign: String, modifier: Modifier = Modifier) {
+fun AboutTruckSection(truckColor: String, truckSign: String, state: AppUiState, modifier: Modifier = Modifier) {
     Row(
         modifier
             .layout { measurable, constraints ->
@@ -52,7 +57,7 @@ fun AboutTruckSection(truckColor: String, truckSign: String, modifier: Modifier 
                 width = 1.dp,
                 color = Gray,
                 shape = RoundedCornerShape(size = 30.dp)
-            ),
+            )
     ) {
         Row(
             modifier = Modifier
@@ -62,7 +67,8 @@ fun AboutTruckSection(truckColor: String, truckSign: String, modifier: Modifier 
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
+                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.width(width = 114.dp)
             ) {
                 Box(
                     modifier = Modifier
@@ -79,7 +85,7 @@ fun AboutTruckSection(truckColor: String, truckSign: String, modifier: Modifier 
                 }
                 Column(
                     modifier = Modifier
-                        .padding(start = 14.dp),
+                        .padding(start = 8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -91,18 +97,23 @@ fun AboutTruckSection(truckColor: String, truckSign: String, modifier: Modifier 
                     Text(
                         text = truckColor,
                         color = LightGray,
-                        fontSize = 15.sp,
-                        fontFamily = poppins(weight = FontWeight.Light)
+                        style = state.truckColorTextStyle,
+                        fontFamily = poppins(weight = FontWeight.Light),
+                        modifier = modifier.drawWithContent {
+                            if (state.truckColorReadyToDraw) drawContent()
+                        },
+                        onTextLayout = state.onTruckColorStyleChange
                     )
                 }
             }
             VerticalDivider(
                 color = Gray,
-                modifier = Modifier.padding(vertical = 5.dp)
+                modifier = Modifier.padding(vertical = 5.dp, horizontal = 8.dp)
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.width(width = 128.dp)
             ) {
                 Box(
                     modifier = Modifier
@@ -119,7 +130,7 @@ fun AboutTruckSection(truckColor: String, truckSign: String, modifier: Modifier 
                 }
                 Column(
                     modifier = Modifier
-                        .padding(start = 14.dp),
+                        .padding(start = 8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -131,8 +142,12 @@ fun AboutTruckSection(truckColor: String, truckSign: String, modifier: Modifier 
                     Text(
                         text = truckSign,
                         color = LightGray,
-                        fontSize = 15.sp,
-                        fontFamily = poppins(weight = FontWeight.Light)
+                        style = state.truckSignTextStyle,
+                        fontFamily = poppins(weight = FontWeight.Light),
+                        modifier = modifier.drawWithContent {
+                            if (state.truckSignReadyToDraw) drawContent()
+                        },
+                        onTextLayout = state.onTruckSignStyleChange
                     )
                 }
             }
@@ -143,5 +158,10 @@ fun AboutTruckSection(truckColor: String, truckSign: String, modifier: Modifier 
 @Preview
 @Composable
 private fun AboutTruckSectionPreview() {
-    AboutTruckSection(truckColor = "Azul", truckSign = "ABC-1234")
+
+    GoogleFontProvider.initialize()
+
+    ModTruckTheme {
+        AboutTruckSection(truckColor = "Azul", truckSign = "ABC-1234", state = AppUiState())
+    }
 }

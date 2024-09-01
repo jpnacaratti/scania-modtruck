@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jpnacaratti.modtruck.extensions.backgroundBlur
+import com.jpnacaratti.modtruck.models.TruckInfo
 import com.jpnacaratti.modtruck.ui.theme.DarkGray
 import com.jpnacaratti.modtruck.ui.theme.LightGray
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
@@ -26,7 +27,7 @@ import com.jpnacaratti.modtruck.utils.GoogleFontProvider
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider.Companion.poppins
 
 @Composable
-fun TruckInfoCard(state: AppUiState = AppUiState(), modifier: Modifier = Modifier) {
+fun TruckInfoCard(state: AppUiState, modifier: Modifier = Modifier) {
 
     val truckColor: String = state.isTruckInfo?.truckColor ?: "-/-"
     val truckSign: String = state.isTruckInfo?.truckSign ?: "-/-"
@@ -73,7 +74,10 @@ fun TruckInfoCard(state: AppUiState = AppUiState(), modifier: Modifier = Modifie
                     onClickListener = state.onConnectButtonClick
                 )
             } else {
-
+                TruckStatus(
+                    progressPercentage = state.getTruckQualityStatus(),
+                    Modifier.padding(vertical = 20.dp)
+                )
             }
 
             Text(
@@ -83,7 +87,7 @@ fun TruckInfoCard(state: AppUiState = AppUiState(), modifier: Modifier = Modifie
                 fontFamily = poppins(weight = FontWeight.Medium)
             )
 
-            AboutTruckSection(truckColor = truckColor, truckSign = truckSign)
+            AboutTruckSection(truckColor = truckColor, truckSign = truckSign, state = state)
         }
     }
 }
@@ -92,7 +96,15 @@ fun TruckInfoCard(state: AppUiState = AppUiState(), modifier: Modifier = Modifie
 @Preview
 @Composable
 private fun TruckInfoCardPreview() {
-    val state = AppUiState(isBlurReady = true)
+    val state = AppUiState(
+        isBlurReady = true,
+        isTruckConnected = true,
+        isTruckInfo = TruckInfo(
+            truckColor = "Laranja",
+            truckSign = "ABC-1234",
+            truckModel = "Scania 620S V8"
+        )
+    )
 
     GoogleFontProvider.initialize()
 
