@@ -1,7 +1,5 @@
 package com.jpnacaratti.modtruck.ui.components
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -15,11 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -31,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jpnacaratti.modtruck.ui.animations.rememberTruckStatusAnimation
 import com.jpnacaratti.modtruck.ui.theme.LightBlue
 import com.jpnacaratti.modtruck.ui.theme.LightDarkBlue
 import com.jpnacaratti.modtruck.ui.theme.LightDarkGray
@@ -40,20 +34,13 @@ import com.jpnacaratti.modtruck.ui.theme.White
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider.Companion.poppins
 import com.nacaratti.modtruck.R
-import kotlinx.coroutines.launch
 
 @Composable
 fun TruckStatus(progressPercentage: Float, modifier: Modifier = Modifier) {
-    var progressPercentage = 0.70f
     val optimizer = 1f - progressPercentage
-
     val width = 270.dp
 
-    val loadingPercentage = remember { Animatable(0f) }
-    val loadingBalloon = remember { Animatable(progressPercentage - 0.45f) } // 64% (70)
-    val alphaBalloon = remember { Animatable(0f) }
-
-    var showBalloon by remember { mutableStateOf(false) }
+    val animationState = rememberTruckStatusAnimation(progressPercentage)
 
     Column(modifier = modifier) {
         Box(
@@ -71,7 +58,7 @@ fun TruckStatus(progressPercentage: Float, modifier: Modifier = Modifier) {
             ) {
                 Box(
                     modifier = Modifier
-                        .width((loadingPercentage.value * width.value).dp)
+                        .width((animationState.loadingPercentage * width.value).dp)
                         .fillMaxHeight()
                         .background(
                             brush = Brush.horizontalGradient(
@@ -80,12 +67,12 @@ fun TruckStatus(progressPercentage: Float, modifier: Modifier = Modifier) {
                                     LightDarkGray,
                                     LightDarkBlue
                                 ),
-                                startX = width.value * ((loadingPercentage.value * 2) - (optimizer / 8))
+                                startX = width.value * ((animationState.loadingPercentage * 2) - (optimizer / 8))
                             )
                         )
                 )
             }
-            if (showBalloon) {
+            if (animationState.showBalloon) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
@@ -100,9 +87,9 @@ fun TruckStatus(progressPercentage: Float, modifier: Modifier = Modifier) {
                                 placeable.place(0, 0)
                             }
                         }
-                        .offset(x = ((loadingBalloon.value * width.value).dp - 30.dp), y = (-20).dp)
+                        .offset(x = ((animationState.loadingBalloon * width.value).dp - 30.dp), y = (-20).dp)
                         .width(width = 60.dp)
-                        .alpha(alphaBalloon.value)
+                        .alpha(animationState.alphaBalloon)
                 ) {
                     Image(
                         painter = painterResource(R.drawable.truck_status_ballon),
@@ -125,39 +112,6 @@ fun TruckStatus(progressPercentage: Float, modifier: Modifier = Modifier) {
             color = LightGray,
             fontFamily = poppins(weight = FontWeight.Light),
             modifier = Modifier.padding(top = 7.dp)
-        )
-    }
-
-    LaunchedEffect(Unit) {
-        loadingPercentage.animateTo(
-            targetValue = progressPercentage - 0.30f, // -40% (70)
-            animationSpec = tween(durationMillis = 1500)
-        ) {
-            if (loadingPercentage.value > progressPercentage - 0.40f){ // -57% (70)
-                showBalloon = true
-                launch {
-                    alphaBalloon.animateTo(
-                        targetValue = 0.8f,
-                        animationSpec = tween(durationMillis = 750)
-                    )
-                }
-            }
-        }
-        launch {
-            loadingPercentage.animateTo(
-                targetValue = progressPercentage,
-                animationSpec = tween(durationMillis = 1000)
-            )
-        }
-        launch {
-            loadingBalloon.animateTo(
-                targetValue = progressPercentage,
-                animationSpec = tween(durationMillis = 2000)
-            )
-        }
-        alphaBalloon.animateTo(
-            targetValue = 1f,
-            animationSpec = tween(durationMillis = 2000)
         )
     }
 }

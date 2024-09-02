@@ -76,7 +76,7 @@ fun TruckInfoCard(state: HomeScreenUiState, modifier: Modifier = Modifier) {
             } else {
                 TruckStatus(
                     progressPercentage = state.getTruckQualityStatus(),
-                    Modifier.padding(vertical = 20.dp)
+                    modifier = Modifier.padding(vertical = 20.dp)
                 )
             }
 
