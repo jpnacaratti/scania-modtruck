@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -30,7 +29,6 @@ import com.jpnacaratti.modtruck.ui.theme.LightDarkGray
 import com.jpnacaratti.modtruck.ui.theme.LightGray
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
 import com.jpnacaratti.modtruck.ui.theme.White
-import com.jpnacaratti.modtruck.ui.viewmodels.AppUiState
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider.Companion.poppins
 import com.nacaratti.modtruck.R

@@ -22,12 +22,12 @@ import com.jpnacaratti.modtruck.ui.theme.DarkGray
 import com.jpnacaratti.modtruck.ui.theme.LightGray
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
 import com.jpnacaratti.modtruck.ui.theme.White
-import com.jpnacaratti.modtruck.ui.viewmodels.AppUiState
+import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider.Companion.poppins
 
 @Composable
-fun TruckInfoCard(state: AppUiState, modifier: Modifier = Modifier) {
+fun TruckInfoCard(state: HomeScreenUiState, modifier: Modifier = Modifier) {
 
     val truckColor: String = state.isTruckInfo?.truckColor ?: "-/-"
     val truckSign: String = state.isTruckInfo?.truckSign ?: "-/-"
@@ -96,7 +96,7 @@ fun TruckInfoCard(state: AppUiState, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun TruckInfoCardPreview() {
-    val state = AppUiState(
+    val state = HomeScreenUiState(
         isBlurReady = true,
         isTruckConnected = true,
         isTruckInfo = TruckInfo(

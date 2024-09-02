@@ -31,13 +31,13 @@ import com.jpnacaratti.modtruck.ui.theme.LightDarkBlue
 import com.jpnacaratti.modtruck.ui.theme.LightGray
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
 import com.jpnacaratti.modtruck.ui.theme.White
-import com.jpnacaratti.modtruck.ui.viewmodels.AppUiState
+import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider.Companion.poppins
 import com.nacaratti.modtruck.R
 
 @Composable
-fun AboutTruckSection(truckColor: String, truckSign: String, state: AppUiState, modifier: Modifier = Modifier) {
+fun AboutTruckSection(truckColor: String, truckSign: String, state: HomeScreenUiState, modifier: Modifier = Modifier) {
     Row(
         modifier
             .layout { measurable, constraints ->
@@ -162,6 +162,6 @@ private fun AboutTruckSectionPreview() {
     GoogleFontProvider.initialize()
 
     ModTruckTheme {
-        AboutTruckSection(truckColor = "Azul", truckSign = "ABC-1234", state = AppUiState())
+        AboutTruckSection(truckColor = "Azul", truckSign = "ABC-1234", state = HomeScreenUiState())
     }
 }

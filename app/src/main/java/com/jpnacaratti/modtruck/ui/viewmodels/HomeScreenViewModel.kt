@@ -1,35 +1,15 @@
 package com.jpnacaratti.modtruck.ui.viewmodels
 
-import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import com.jpnacaratti.modtruck.models.TruckInfo
+import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-data class AppUiState(
-    val isTruckConnected: Boolean = false,
-    val isBlurReady: Boolean = false,
-    val isTruckInfo: TruckInfo? = null,
-    val truckColorTextStyle: TextStyle = TextStyle(fontSize = 15.sp),
-    val truckSignTextStyle: TextStyle = TextStyle(fontSize = 15.sp),
-    val truckColorReadyToDraw: Boolean = false,
-    val truckSignReadyToDraw: Boolean = false,
-    val onBlurReady: () -> Unit = {},
-    val onConnectButtonClick: () -> Unit = {},
-    val onTruckSignStyleChange: (TextLayoutResult) -> Unit = {},
-    val onTruckColorStyleChange: (TextLayoutResult) -> Unit = {}
-) {
-    fun getTruckQualityStatus(): Float {
-        return 0.73f // TODO: Calc
-    }
-}
-
 class HomeScreenViewModel : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AppUiState())
+    private val _uiState = MutableStateFlow(HomeScreenUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
