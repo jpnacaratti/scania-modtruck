@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.jpnacaratti.modtruck.models.TruckInfo
+import com.jpnacaratti.modtruck.ui.animations.rememberTruckEntryAnimation
 import com.jpnacaratti.modtruck.ui.components.TruckInfoCard
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
 import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
@@ -59,9 +60,7 @@ fun HomeScreen(modifier: Modifier = Modifier, state: HomeScreenUiState = HomeScr
 
         if (state.isTruckConnected) {
 
-            LaunchedEffect(Unit) {
-                state.startTruckEntryAnimation(duration = 2000)
-            }
+            val animationState = rememberTruckEntryAnimation(duration = 2000)
 
             Image(
                 painter = painterResource(R.drawable.truck_connected),
@@ -69,8 +68,8 @@ fun HomeScreen(modifier: Modifier = Modifier, state: HomeScreenUiState = HomeScr
                 modifier = Modifier
                     .fillMaxWidth()
                     .offset(
-                        x = state.truckOffsetX.value.dp,
-                        y = state.truckOffsetY.value.dp
+                        x = animationState.truckOffsetX.dp,
+                        y = animationState.truckOffsetY.dp
                     )
                     .height(439.dp)
             )
