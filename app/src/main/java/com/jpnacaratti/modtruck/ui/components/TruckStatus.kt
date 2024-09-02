@@ -53,8 +53,6 @@ fun TruckStatus(progressPercentage: Float, modifier: Modifier = Modifier) {
     val loadingBalloon = remember { Animatable(progressPercentage - 0.45f) } // 64% (70)
     val alphaBalloon = remember { Animatable(0f) }
 
-    var modifiedWidth by remember { mutableStateOf(0f) }
-    var balloonOffset by remember { mutableStateOf((progressPercentage - 0.45f) * width.value) } // 64% (70)
     var showBalloon by remember { mutableStateOf(false) }
 
     Column(modifier = modifier) {
@@ -73,7 +71,7 @@ fun TruckStatus(progressPercentage: Float, modifier: Modifier = Modifier) {
             ) {
                 Box(
                     modifier = Modifier
-                        .width(modifiedWidth.dp)
+                        .width((loadingPercentage.value * width.value).dp)
                         .fillMaxHeight()
                         .background(
                             brush = Brush.horizontalGradient(
@@ -102,7 +100,7 @@ fun TruckStatus(progressPercentage: Float, modifier: Modifier = Modifier) {
                                 placeable.place(0, 0)
                             }
                         }
-                        .offset(x = (balloonOffset.dp - 30.dp), y = (-20).dp)
+                        .offset(x = ((loadingBalloon.value * width.value).dp - 30.dp), y = (-20).dp)
                         .width(width = 60.dp)
                         .alpha(alphaBalloon.value)
                 ) {
@@ -135,13 +133,12 @@ fun TruckStatus(progressPercentage: Float, modifier: Modifier = Modifier) {
             targetValue = progressPercentage - 0.30f, // -40% (70)
             animationSpec = tween(durationMillis = 1500)
         ) {
-            modifiedWidth = loadingPercentage.value * width.value
             if (loadingPercentage.value > progressPercentage - 0.40f){ // -57% (70)
                 showBalloon = true
                 launch {
                     alphaBalloon.animateTo(
                         targetValue = 0.8f,
-                        animationSpec = tween(durationMillis = 1000)
+                        animationSpec = tween(durationMillis = 750)
                     )
                 }
             }
@@ -150,17 +147,13 @@ fun TruckStatus(progressPercentage: Float, modifier: Modifier = Modifier) {
             loadingPercentage.animateTo(
                 targetValue = progressPercentage,
                 animationSpec = tween(durationMillis = 1000)
-            ) {
-                modifiedWidth = loadingPercentage.value * width.value
-            }
+            )
         }
         launch {
             loadingBalloon.animateTo(
                 targetValue = progressPercentage,
                 animationSpec = tween(durationMillis = 2000)
-            ) {
-                balloonOffset = loadingBalloon.value * width.value
-            }
+            )
         }
         alphaBalloon.animateTo(
             targetValue = 1f,
