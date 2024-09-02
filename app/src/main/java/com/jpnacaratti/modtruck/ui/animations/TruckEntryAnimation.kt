@@ -7,14 +7,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun rememberTruckEntryAnimation(duration: Int): TruckEntryAnimationState {
+fun rememberTruckEntryAnimation(duration: Int, delayStart: Long = 0): TruckEntryAnimationState {
     val truckOffsetX = remember { Animatable(310.dp.value) }
     val truckOffsetY = remember { Animatable(-145.dp.value) }
 
     LaunchedEffect(Unit) {
+        delay(delayStart)
         launch {
             truckOffsetX.animateTo(
                 targetValue = 8.dp.value,

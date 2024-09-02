@@ -26,18 +26,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jpnacaratti.modtruck.ui.animations.AboutTruckColorAnimationState
+import com.jpnacaratti.modtruck.ui.animations.rememberAboutTruckColorAnimation
 import com.jpnacaratti.modtruck.ui.theme.Gray
 import com.jpnacaratti.modtruck.ui.theme.LightDarkBlue
 import com.jpnacaratti.modtruck.ui.theme.LightGray
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
 import com.jpnacaratti.modtruck.ui.theme.White
 import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
+import com.jpnacaratti.modtruck.ui.theme.LightBlue
+import com.jpnacaratti.modtruck.ui.theme.Orange
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider.Companion.poppins
 import com.nacaratti.modtruck.R
 
 @Composable
 fun AboutTruckSection(truckColor: String, truckSign: String, state: HomeScreenUiState, modifier: Modifier = Modifier) {
+
+    var animationState: AboutTruckColorAnimationState? = null
+    if (state.isTruckConnected) {
+        animationState = rememberAboutTruckColorAnimation(
+            duration = 500,
+            startAndEndColor = LightDarkBlue,
+            truckFinalColor = Orange,
+            signFinalColor = LightBlue,
+            delayStart = 1750
+        )
+    }
+
     Row(
         modifier
             .layout { measurable, constraints ->
@@ -74,7 +90,7 @@ fun AboutTruckSection(truckColor: String, truckSign: String, state: HomeScreenUi
                     modifier = Modifier
                         .size(53.dp)
                         .clip(shape = RoundedCornerShape(size = 15.dp))
-                        .background(color = LightDarkBlue),
+                        .background(color = animationState?.truckBackgroundColor ?: LightDarkBlue),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
@@ -119,7 +135,7 @@ fun AboutTruckSection(truckColor: String, truckSign: String, state: HomeScreenUi
                     modifier = Modifier
                         .size(53.dp)
                         .clip(shape = RoundedCornerShape(size = 15.dp))
-                        .background(color = LightDarkBlue),
+                        .background(color = animationState?.signBackgroundTruck ?: LightDarkBlue),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(

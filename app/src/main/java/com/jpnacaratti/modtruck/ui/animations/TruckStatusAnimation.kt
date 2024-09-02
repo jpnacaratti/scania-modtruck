@@ -8,10 +8,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun rememberTruckStatusAnimation(progressPercentage: Float): TruckStatusAnimationState {
+fun rememberTruckStatusAnimation(progressPercentage: Float, delayStart: Long = 0): TruckStatusAnimationState {
 
     val startingLoadingBalloonPercentage = progressPercentage - (progressPercentage * 0.64f) // 0.45
     val firstLoadingPercentage = progressPercentage - (progressPercentage * 0.40f) // 0.30
@@ -24,6 +25,7 @@ fun rememberTruckStatusAnimation(progressPercentage: Float): TruckStatusAnimatio
     var showBalloon by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
+        delay(delayStart)
         loadingPercentage.animateTo(
             targetValue = firstLoadingPercentage, // -40% (70)
             animationSpec = tween(durationMillis = 1500)
