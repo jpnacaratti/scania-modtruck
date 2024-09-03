@@ -16,13 +16,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jpnacaratti.modtruck.extensions.backgroundBlur
+import com.jpnacaratti.modtruck.extensions.BackgroundBlurLayer
 import com.jpnacaratti.modtruck.models.TruckInfo
+import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
 import com.jpnacaratti.modtruck.ui.theme.DarkGray
 import com.jpnacaratti.modtruck.ui.theme.LightGray
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
 import com.jpnacaratti.modtruck.ui.theme.White
-import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider.Companion.poppins
 
@@ -38,14 +38,13 @@ fun TruckOverviewCard(state: HomeScreenUiState, modifier: Modifier = Modifier) {
         modifier = modifier
             .size(size = 330.dp)
             .clip(shape = RoundedCornerShape(40.dp))
-            .backgroundBlur(
-                blurRadius = 9,
-                shape = RoundedCornerShape(40.dp),
-                backgroundColor = DarkGray,
-                backgroundColorAlpha = 0.8f,
-                state.onFirstCardBlurReady
-            )
     ) {
+        BackgroundBlurLayer(blurRadius = 9,
+            backgroundColor = DarkGray,
+            backgroundColorAlpha = 0.8f,
+            state.onFirstCardBlurReady
+        )
+
         if (!state.isFirstCardBlurReady) return
 
         Column(

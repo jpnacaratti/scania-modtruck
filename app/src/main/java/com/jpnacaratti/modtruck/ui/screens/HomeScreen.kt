@@ -3,15 +3,19 @@ package com.jpnacaratti.modtruck.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
@@ -37,54 +41,58 @@ fun HomeScreen(viewModel: HomeScreenViewModel, modifier: Modifier = Modifier) {
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier, state: HomeScreenUiState = HomeScreenUiState()) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
         color = Color.Transparent,
         darkIcons = false
     )
 
-    Box(
+    Column(
         modifier = modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.primary)
+            .background(color = MaterialTheme.colorScheme.primary).verticalScroll(
+                rememberScrollState()
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(R.drawable.truck_not_connected),
-            contentDescription = "Truck base image",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(height = 439.dp)
-                .offset(x = (-10).dp)
-        )
+        Box() {
+            Image(
+                painter = painterResource(R.drawable.truck_not_connected),
+                contentDescription = "Truck base image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(height = 439.dp)
+                    .offset(x = (-10).dp)
+            )
+
+            if (state.isTruckConnected) {
+
+                val animationState = rememberTruckEntryAnimation(duration = 2000)
+
+                Image(
+                    painter = painterResource(R.drawable.truck_connected),
+                    contentDescription = "Truck image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(
+                            x = animationState.truckOffsetX.dp,
+                            y = animationState.truckOffsetY.dp
+                        )
+                        .height(439.dp)
+                )
+            }
+        }
 
         TruckOverviewCard(
             state = state, modifier = Modifier
                 .offset(
-                    x = (screenWidth - 330.dp) / 2,
-                    y = 408.dp
+//                    x = (screenWidth - 330.dp) / 2,
+                    y = (-21).dp
                 )
         )
 
-        if (state.isTruckConnected) {
 
-            val animationState = rememberTruckEntryAnimation(duration = 2000)
-
-            Image(
-                painter = painterResource(R.drawable.truck_connected),
-                contentDescription = "Truck image",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .offset(
-                        x = animationState.truckOffsetX.dp,
-                        y = animationState.truckOffsetY.dp
-                    )
-                    .height(439.dp)
-            )
-        }
-
-//        TruckInfoCard(state = state, modifier = Modifier.padding(top = 40.dp))
+        TruckInfoCard(state = state, modifier = Modifier.padding(top = 40.dp))
     }
 }
 
