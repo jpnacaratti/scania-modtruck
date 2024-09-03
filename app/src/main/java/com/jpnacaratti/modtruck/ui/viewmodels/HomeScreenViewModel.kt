@@ -15,8 +15,8 @@ class HomeScreenViewModel : ViewModel() {
     init {
         _uiState.update { currentState ->
             currentState.copy(
-                onBlurReady = {
-                    _uiState.update { it.copy(isBlurReady = true) }
+                onFirstCardBlurReady = {
+                    _uiState.update { it.copy(isFirstCardBlurReady = true) }
                 },
                 onConnectButtonClick = {
                     _uiState.update {

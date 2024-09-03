@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,6 +22,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.jpnacaratti.modtruck.models.TruckInfo
 import com.jpnacaratti.modtruck.ui.animations.rememberTruckEntryAnimation
 import com.jpnacaratti.modtruck.ui.components.TruckInfoCard
+import com.jpnacaratti.modtruck.ui.components.TruckOverviewCard
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
 import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
 import com.jpnacaratti.modtruck.ui.viewmodels.HomeScreenViewModel
@@ -57,6 +59,14 @@ fun HomeScreen(modifier: Modifier = Modifier, state: HomeScreenUiState = HomeScr
                 .offset(x = (-10).dp)
         )
 
+        TruckOverviewCard(
+            state = state, modifier = Modifier
+                .offset(
+                    x = (screenWidth - 330.dp) / 2,
+                    y = 408.dp
+                )
+        )
+
         if (state.isTruckConnected) {
 
             val animationState = rememberTruckEntryAnimation(duration = 2000)
@@ -74,13 +84,7 @@ fun HomeScreen(modifier: Modifier = Modifier, state: HomeScreenUiState = HomeScr
             )
         }
 
-        TruckInfoCard(
-            state = state, modifier = Modifier
-                .offset(
-                    x = (screenWidth - 330.dp) / 2,
-                    y = 408.dp
-                )
-        )
+//        TruckInfoCard(state = state, modifier = Modifier.padding(top = 40.dp))
     }
 }
 
@@ -88,7 +92,7 @@ fun HomeScreen(modifier: Modifier = Modifier, state: HomeScreenUiState = HomeScr
 @Composable
 private fun HomeScreenPreview() {
     val state = HomeScreenUiState(
-        isBlurReady = true,
+        isFirstCardBlurReady = true,
         isTruckConnected = true,
         isTruckInfo = TruckInfo(
             truckColor = "Laranja",

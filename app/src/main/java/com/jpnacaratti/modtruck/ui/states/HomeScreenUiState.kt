@@ -7,13 +7,13 @@ import com.jpnacaratti.modtruck.models.TruckInfo
 
 data class HomeScreenUiState(
     val isTruckConnected: Boolean = false,
-    val isBlurReady: Boolean = false,
+    val isFirstCardBlurReady: Boolean = false,
     val isTruckInfo: TruckInfo? = null,
     val truckColorTextStyle: TextStyle = TextStyle(fontSize = 15.sp),
     val truckSignTextStyle: TextStyle = TextStyle(fontSize = 15.sp),
     val truckColorReadyToDraw: Boolean = false,
     val truckSignReadyToDraw: Boolean = false,
-    val onBlurReady: () -> Unit = {},
+    val onFirstCardBlurReady: () -> Unit = {},
     val onConnectButtonClick: () -> Unit = {},
     val onTruckSignStyleChange: (TextLayoutResult) -> Unit = {},
     val onTruckColorStyleChange: (TextLayoutResult) -> Unit = {}

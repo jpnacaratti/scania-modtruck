@@ -1,118 +1,94 @@
 package com.jpnacaratti.modtruck.ui.components
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jpnacaratti.modtruck.extensions.backgroundBlur
-import com.jpnacaratti.modtruck.models.TruckInfo
+import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
 import com.jpnacaratti.modtruck.ui.theme.DarkGray
+import com.jpnacaratti.modtruck.ui.theme.LightBlue
 import com.jpnacaratti.modtruck.ui.theme.LightGray
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
 import com.jpnacaratti.modtruck.ui.theme.White
-import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider.Companion.poppins
 
 @Composable
 fun TruckInfoCard(state: HomeScreenUiState, modifier: Modifier = Modifier) {
-
-    val truckColor: String = state.isTruckInfo?.truckColor ?: "-/-"
-    val truckSign: String = state.isTruckInfo?.truckSign ?: "-/-"
-
-    val truckModel: String = state.isTruckInfo?.truckModel ?: "Nenhum caminhão conectado"
-
-    Box(
+    Column(
         modifier = modifier
-            .size(size = 330.dp)
+            .width(330.dp)
+            .height(431.dp)
             .clip(shape = RoundedCornerShape(40.dp))
-            .backgroundBlur(
-                blurRadius = 9,
-                shape = RoundedCornerShape(40.dp),
-                backgroundColor = DarkGray,
-                backgroundColorAlpha = 0.8f,
-                state.onBlurReady
-            )
+            .background(color = DarkGray)
+            .alpha(alpha = 0.8f)
+            .padding(19.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (!state.isBlurReady) return
-
-        Column(
+        Text(
+            text = "Informações",
+            color = White,
+            fontFamily = poppins(weight = FontWeight.Medium),
+            fontSize = 20.sp
+        )
+        Row(
             modifier = Modifier
-                .padding(30.dp)
-                .fillMaxWidth()
+                .padding(top = 14.dp, bottom = 22.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Overview",
-                color = White,
-                fontSize = 18.sp,
-                fontFamily = poppins(weight = FontWeight.Medium)
+                text = "5",
+                color = LightBlue,
+                fontFamily = poppins(weight = FontWeight.Medium),
+                fontSize = 40.sp
             )
             Text(
-                truckModel,
+                text = "módulos acoplados",
                 color = LightGray,
-                fontSize = 15.sp,
-                fontFamily = poppins(weight = FontWeight.Light)
+                fontFamily = poppins(weight = FontWeight.Light),
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .width(93.dp)
+                    .padding(start = 13.dp)
             )
-
-            if (!state.isTruckConnected) {
-                ConnectTruckButton(
-                    modifier = Modifier
-                        .padding(vertical = 20.dp)
-                        .align(alignment = Alignment.CenterHorizontally),
-                    onClickListener = state.onConnectButtonClick
-                )
-            } else {
-                TruckStatus(
-                    progressPercentage = state.getTruckQualityStatus(),
-                    modifier = Modifier.padding(vertical = 20.dp)
-                )
-            }
-
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(
-                text = "Sobre o caminhão",
-                fontSize = 18.sp,
+                text = "Tempo de atividade:",
                 color = White,
-                fontFamily = poppins(weight = FontWeight.Medium)
+                fontFamily = poppins(weight = FontWeight.Light),
+                fontSize = 17.sp
             )
-
-            AboutTruckSection(truckColor = truckColor, truckSign = truckSign, state = state)
+            Text(text = "1hr 32m 20s",
+                color = LightGray,
+                fontFamily = poppins(weight = FontWeight.Light),
+                fontSize = 17.sp
+            )
         }
     }
 }
 
-
 @Preview
 @Composable
 private fun TruckInfoCardPreview() {
-    val state = HomeScreenUiState(
-        isBlurReady = true,
-        isTruckConnected = true,
-        isTruckInfo = TruckInfo(
-            truckColor = "Laranja",
-            truckSign = "ABC-1234",
-            truckModel = "Scania 620S V8"
-        )
-    )
-
     GoogleFontProvider.initialize()
 
     ModTruckTheme {
-        Surface(
-            color = DarkGray
-        ) {
-            TruckInfoCard(state)
-        }
+        TruckInfoCard(HomeScreenUiState())
     }
 }
