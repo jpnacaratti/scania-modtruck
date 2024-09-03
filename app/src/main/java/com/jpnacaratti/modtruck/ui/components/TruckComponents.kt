@@ -2,6 +2,7 @@ package com.jpnacaratti.modtruck.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -60,7 +61,7 @@ fun TruckColorRow(truckColor: String, state: HomeScreenUiState, animationState: 
                 color = LightGray,
                 style = state.truckColorTextStyle,
                 fontFamily = poppins(weight = FontWeight.Light),
-                modifier = modifier.drawWithContent {
+                modifier = Modifier.align(alignment = Alignment.CenterHorizontally).drawWithContent {
                     if (state.truckColorReadyToDraw) drawContent()
                 },
                 onTextLayout = state.onTruckColorStyleChange
@@ -103,9 +104,9 @@ fun TruckSignRow(truckSign: String, state: HomeScreenUiState, animationState: Ab
                 color = LightGray,
                 style = state.truckSignTextStyle,
                 fontFamily = poppins(weight = FontWeight.Light),
-                modifier = modifier.drawWithContent {
+                modifier = Modifier.align(alignment = Alignment.CenterHorizontally).drawWithContent {
                     if (state.truckSignReadyToDraw) drawContent()
-                },
+                }.align(alignment = Alignment.CenterHorizontally),
                 onTextLayout = state.onTruckSignStyleChange
             )
         }

@@ -8,10 +8,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.view.WindowCompat
 import com.jpnacaratti.modtruck.ui.screens.HomeScreen
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
 import com.jpnacaratti.modtruck.ui.viewmodels.HomeScreenViewModel
+import com.jpnacaratti.modtruck.ui.viewmodels.TruckViewModel
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider
 
 class MainActivity : ComponentActivity() {
@@ -24,23 +24,31 @@ class MainActivity : ComponentActivity() {
 
         window.attributes.layoutInDisplayCutoutMode =
             WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-        
+
+        val truckViewModel by viewModels<TruckViewModel>()
+
         setContent {
-            val viewModel by viewModels<HomeScreenViewModel>()
-            App(viewModel)
+            val screenViewModel by viewModels<HomeScreenViewModel>()
+            App(
+                truckViewModel = truckViewModel,
+                homeScreenViewModel = screenViewModel
+            )
         }
     }
 }
 
 @Composable
-fun App(viewModel: HomeScreenViewModel) {
+fun App(truckViewModel: TruckViewModel, homeScreenViewModel: HomeScreenViewModel) {
     ModTruckTheme {
-        HomeScreen(viewModel = viewModel)
+        HomeScreen(
+            truckViewModel = truckViewModel,
+            screenViewModel = homeScreenViewModel
+        )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun AppPreview() {
-    App(viewModel = HomeScreenViewModel())
+//    App(homeScreenViewModel = HomeScreenViewModel())
 }

@@ -3,6 +3,7 @@ package com.jpnacaratti.modtruck.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,17 +19,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
 import com.jpnacaratti.modtruck.ui.theme.DarkGray
 import com.jpnacaratti.modtruck.ui.theme.LightBlue
 import com.jpnacaratti.modtruck.ui.theme.LightGray
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
 import com.jpnacaratti.modtruck.ui.theme.White
+import com.jpnacaratti.modtruck.ui.viewmodels.TruckViewModel
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider.Companion.poppins
 
 @Composable
-fun TruckInfoCard(state: HomeScreenUiState, modifier: Modifier = Modifier) {
+fun TruckInfoCard(truckViewModel: TruckViewModel, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .width(330.dp)
@@ -52,7 +53,7 @@ fun TruckInfoCard(state: HomeScreenUiState, modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "5",
+                text = "${truckViewModel.getConnectedModulesCount()}",
                 color = LightBlue,
                 fontFamily = poppins(weight = FontWeight.Medium),
                 fontSize = 40.sp
@@ -63,23 +64,29 @@ fun TruckInfoCard(state: HomeScreenUiState, modifier: Modifier = Modifier) {
                 fontFamily = poppins(weight = FontWeight.Light),
                 fontSize = 16.sp,
                 modifier = Modifier
-                    .width(93.dp)
+                    .width(IntrinsicSize.Min)
                     .padding(start = 13.dp)
             )
         }
+
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(
                 text = "Tempo de atividade:",
                 color = White,
                 fontFamily = poppins(weight = FontWeight.Light),
-                fontSize = 17.sp
+                fontSize = 15.sp
             )
-            Text(text = "1hr 32m 20s",
+            Text(text = truckViewModel.getActiveTimeFormatted(),
                 color = LightGray,
                 fontFamily = poppins(weight = FontWeight.Light),
-                fontSize = 17.sp
+                fontSize = 15.sp
             )
         }
+
+        TruckModulesInfo(
+            truckViewModel = truckViewModel,
+            modifier = Modifier.padding(top = 38.dp)
+        )
     }
 }
 
@@ -89,6 +96,6 @@ private fun TruckInfoCardPreview() {
     GoogleFontProvider.initialize()
 
     ModTruckTheme {
-        TruckInfoCard(HomeScreenUiState())
+        TruckInfoCard(TruckViewModel())
     }
 }
