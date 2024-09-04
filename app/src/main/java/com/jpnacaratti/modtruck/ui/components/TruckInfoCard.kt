@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,7 +32,6 @@ fun TruckInfoCard(truckViewModel: TruckViewModel, modifier: Modifier = Modifier)
     Column(
         modifier = modifier
             .width(330.dp)
-            .height(431.dp)
             .clip(shape = RoundedCornerShape(40.dp))
             .background(color = DarkGray)
             .alpha(alpha = 0.8f)
