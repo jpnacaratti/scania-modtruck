@@ -26,6 +26,7 @@ import com.jpnacaratti.modtruck.models.TruckInfo
 import com.jpnacaratti.modtruck.ui.animations.rememberTruckEntryAnimation
 import com.jpnacaratti.modtruck.ui.components.TruckInfoCard
 import com.jpnacaratti.modtruck.ui.components.TruckOverviewCard
+import com.jpnacaratti.modtruck.ui.components.TruckViewModulesCard
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
 import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
 import com.jpnacaratti.modtruck.ui.viewmodels.HomeScreenViewModel
@@ -90,7 +91,11 @@ fun HomeScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier, st
                 )
         )
 
+        if (!state.isTruckConnected) return
+
         TruckInfoCard(truckViewModel = truckViewModel)
+
+        TruckViewModulesCard(modifier = Modifier.padding(vertical = 20.dp))
     }
 }
 
