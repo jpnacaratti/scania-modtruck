@@ -1,4 +1,4 @@
-package com.jpnacaratti.modtruck.extensions
+package com.jpnacaratti.modtruck.utils
 
 import android.graphics.Bitmap
 import android.graphics.Canvas

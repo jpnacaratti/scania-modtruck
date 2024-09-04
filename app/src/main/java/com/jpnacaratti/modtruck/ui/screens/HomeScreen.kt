@@ -42,16 +42,11 @@ fun HomeScreen(truckViewModel: TruckViewModel, screenViewModel: HomeScreenViewMo
 
 @Composable
 fun HomeScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier, state: HomeScreenUiState = HomeScreenUiState()) {
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setSystemBarsColor(
-        color = Color.Transparent,
-        darkIcons = false
-    )
-
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.primary).verticalScroll(
+            .background(color = MaterialTheme.colorScheme.primary)
+            .verticalScroll(
                 rememberScrollState()
             ),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -95,7 +90,7 @@ fun HomeScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier, st
 
         TruckInfoCard(truckViewModel = truckViewModel)
 
-        TruckViewModulesCard(modifier = Modifier.padding(vertical = 20.dp))
+        TruckViewModulesCard(modifier = Modifier.padding(top = 20.dp, bottom = 100.dp))
     }
 }
 
