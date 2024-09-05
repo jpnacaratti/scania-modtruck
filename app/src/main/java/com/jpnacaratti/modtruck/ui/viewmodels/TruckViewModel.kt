@@ -20,6 +20,13 @@ class TruckViewModel : ViewModel() {
     private val _engineHealthModule = MutableStateFlow(EngineHealthModule(connected = true, rpm = 3000, temperature = 80F))
     val engineHealthModule: StateFlow<EngineHealthModule> = _engineHealthModule.asStateFlow()
 
+    private val _truckConnected = MutableStateFlow(false)
+    val truckConnected: StateFlow<Boolean> = _truckConnected.asStateFlow()
+
+    fun setTruckConnected(value: Boolean) {
+        _truckConnected.value = value
+    }
+
     fun getConnectedModulesCount(): Int {
         return listOf(
             batteryLevelModule.value.connected,

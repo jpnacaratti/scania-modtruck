@@ -1,5 +1,6 @@
 package com.jpnacaratti.modtruck.ui.components
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,10 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.EXTRA_DATA
+import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.TRUCK_CONNECTED
 import com.jpnacaratti.modtruck.models.TruckInfo
 import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
 import com.jpnacaratti.modtruck.ui.theme.DarkGray
@@ -28,7 +32,12 @@ import com.jpnacaratti.modtruck.utils.GoogleFontProvider
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider.Companion.poppins
 
 @Composable
-fun TruckOverviewCard(state: HomeScreenUiState, modifier: Modifier = Modifier) {
+fun TruckOverviewCard(
+    truckConnected: Boolean,
+    state: HomeScreenUiState,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
 
     val truckColor: String = state.isTruckInfo?.truckColor ?: "-/-"
     val truckSign: String = state.isTruckInfo?.truckSign ?: "-/-"
@@ -42,18 +51,12 @@ fun TruckOverviewCard(state: HomeScreenUiState, modifier: Modifier = Modifier) {
             .background(color = DarkGray)
             .alpha(0.8f)
     ) {
-//        BackgroundBlurLayer(blurRadius = 9,
-//            backgroundColor = DarkGray,
-//            backgroundColorAlpha = 0.8f,
-//            state.onFirstCardBlurReady
-//        )
-//
-//        if (!state.isFirstCardBlurReady) return
 
         Column(
             modifier = Modifier
                 .padding(30.dp)
-                .fillMaxWidth().alpha(1f)
+                .fillMaxWidth()
+                .alpha(1f)
         ) {
             Text(
                 "Overview",
@@ -68,12 +71,21 @@ fun TruckOverviewCard(state: HomeScreenUiState, modifier: Modifier = Modifier) {
                 fontFamily = poppins(weight = FontWeight.Light)
             )
 
-            if (!state.isTruckConnected) {
+            if (!truckConnected) {
                 ConnectTruckButton(
                     modifier = Modifier
                         .padding(vertical = 20.dp)
                         .align(alignment = Alignment.CenterHorizontally),
-                    onClickListener = state.onConnectButtonClick
+                    onClickListener = {
+
+                        // TODO: Remove this and change only when truck is connected
+                        val intent = Intent(TRUCK_CONNECTED).apply {
+                            putExtra(EXTRA_DATA, true)
+                        }
+                        context.sendBroadcast(intent)
+
+                        state.onConnectButtonClick
+                    }
                 )
             } else {
                 TruckStatus(
@@ -89,7 +101,12 @@ fun TruckOverviewCard(state: HomeScreenUiState, modifier: Modifier = Modifier) {
                 fontFamily = poppins(weight = FontWeight.Medium)
             )
 
-            AboutTruckSection(truckColor = truckColor, truckSign = truckSign, state = state)
+            AboutTruckSection(
+                truckColor = truckColor,
+                truckSign = truckSign,
+                truckConnected = truckConnected,
+                state = state
+            )
         }
     }
 }
@@ -100,7 +117,6 @@ fun TruckOverviewCard(state: HomeScreenUiState, modifier: Modifier = Modifier) {
 private fun TruckOverviewCardPreview() {
     val state = HomeScreenUiState(
         isFirstCardBlurReady = true,
-        isTruckConnected = true,
         isTruckInfo = TruckInfo(
             truckColor = "Laranja",
             truckSign = "ABC-1234",
@@ -114,7 +130,7 @@ private fun TruckOverviewCardPreview() {
         Surface(
             color = DarkGray
         ) {
-            TruckOverviewCard(state)
+            TruckOverviewCard(truckConnected = true, state = state)
         }
     }
 }

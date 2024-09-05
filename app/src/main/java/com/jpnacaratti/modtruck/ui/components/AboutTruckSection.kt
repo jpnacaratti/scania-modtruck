@@ -16,19 +16,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jpnacaratti.modtruck.ui.animations.AboutTruckColorAnimationState
 import com.jpnacaratti.modtruck.ui.animations.rememberAboutTruckColorAnimation
+import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
 import com.jpnacaratti.modtruck.ui.theme.Gray
+import com.jpnacaratti.modtruck.ui.theme.LightBlue
 import com.jpnacaratti.modtruck.ui.theme.LightDarkBlue
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
-import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
-import com.jpnacaratti.modtruck.ui.theme.LightBlue
 import com.jpnacaratti.modtruck.ui.theme.Orange
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider
 
 @Composable
-fun AboutTruckSection(truckColor: String, truckSign: String, state: HomeScreenUiState, modifier: Modifier = Modifier) {
+fun AboutTruckSection(
+    truckColor: String,
+    truckSign: String,
+    truckConnected: Boolean,
+    state: HomeScreenUiState,
+    modifier: Modifier = Modifier
+) {
 
     var animationState: AboutTruckColorAnimationState? = null
-    if (state.isTruckConnected) {
+    if (truckConnected) {
         animationState = rememberAboutTruckColorAnimation(
             duration = 500,
             startAndEndColor = LightDarkBlue,
@@ -92,6 +98,11 @@ private fun AboutTruckSectionPreview() {
     GoogleFontProvider.initialize()
 
     ModTruckTheme {
-        AboutTruckSection(truckColor = "Azul", truckSign = "ABC-1234", state = HomeScreenUiState())
+        AboutTruckSection(
+            truckColor = "Azul",
+            truckSign = "ABC-1234",
+            truckConnected = true,
+            state = HomeScreenUiState()
+        )
     }
 }

@@ -15,14 +15,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.jpnacaratti.modtruck.models.TruckInfo
+import com.jpnacaratti.modtruck.ui.animations.rememberBaseMoveAnimation
 import com.jpnacaratti.modtruck.ui.animations.rememberTruckEntryAnimation
 import com.jpnacaratti.modtruck.ui.components.TruckInfoCard
 import com.jpnacaratti.modtruck.ui.components.TruckOverviewCard
@@ -42,13 +46,17 @@ fun HomeScreen(truckViewModel: TruckViewModel, screenViewModel: HomeScreenViewMo
 
 @Composable
 fun HomeScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier, state: HomeScreenUiState = HomeScreenUiState()) {
+    val truckConnected by truckViewModel.truckConnected.collectAsState()
+
+    var overviewCardPosition by remember { mutableStateOf(0f) }
+    var infoCardPosition by remember { mutableStateOf(0f) }
+    var modulesCardPosition by remember { mutableStateOf(0f) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.primary)
-            .verticalScroll(
-                rememberScrollState()
-            ),
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box {
@@ -57,12 +65,11 @@ fun HomeScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier, st
                 contentDescription = "Truck base image",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(height = 439.dp)
+                    .height(439.dp)
                     .offset(x = (-10).dp)
             )
 
-            if (state.isTruckConnected) {
-
+            if (truckConnected) {
                 val animationState = rememberTruckEntryAnimation(duration = 2000)
 
                 Image(
@@ -79,18 +86,55 @@ fun HomeScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier, st
             }
         }
 
-        TruckOverviewCard(
-            state = state, modifier = Modifier
-                .offset(
-                    y = (-21).dp
-                )
+        val overviewAnimationState = rememberBaseMoveAnimation(
+            duration = 750,
+            initialY = overviewCardPosition.plus(500.dp.value),
+            finalY = overviewCardPosition.minus(21.dp.value)
         )
 
-        if (!state.isTruckConnected) return
+        TruckOverviewCard(
+            truckConnected = truckConnected,
+            state = state,
+            modifier = Modifier
+                .offset(y = overviewAnimationState.compOffsetY.dp)
+                .onGloballyPositioned { coordinates ->
+                    overviewCardPosition = coordinates.positionInParent().y
+                }
+        )
 
-        TruckInfoCard(truckViewModel = truckViewModel)
+        if (!truckConnected) return
 
-        TruckViewModulesCard(modifier = Modifier.padding(top = 20.dp, bottom = 100.dp))
+        val infoAnimationState = rememberBaseMoveAnimation(
+            duration = 750,
+            initialY = infoCardPosition.plus(500.dp.value),
+            finalY = infoCardPosition,
+            delayStart = 375
+        )
+
+        TruckInfoCard(
+            truckViewModel = truckViewModel,
+            modifier = Modifier
+                .offset(y = infoAnimationState.compOffsetY.dp)
+                .onGloballyPositioned { coordinates ->
+                    infoCardPosition = coordinates.positionInParent().y
+                }
+        )
+
+        val modulesAnimationState = rememberBaseMoveAnimation(
+            duration = 750,
+            initialY = modulesCardPosition.plus(500.dp.value),
+            finalY = modulesCardPosition,
+            delayStart = 750
+        )
+
+        TruckViewModulesCard(
+            modifier = Modifier
+                .padding(top = 20.dp, bottom = 100.dp)
+                .offset(y = modulesAnimationState.compOffsetY.dp)
+                .onGloballyPositioned { coordinates ->
+                    modulesCardPosition = coordinates.positionInParent().y
+                }
+        )
     }
 }
 
@@ -99,7 +143,6 @@ fun HomeScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier, st
 private fun HomeScreenPreview() {
     val state = HomeScreenUiState(
         isFirstCardBlurReady = true,
-        isTruckConnected = true,
         isTruckInfo = TruckInfo(
             truckColor = "Laranja",
             truckSign = "ABC-1234",

@@ -21,7 +21,6 @@ class HomeScreenViewModel : ViewModel() {
                 onConnectButtonClick = {
                     _uiState.update {
                         it.copy(
-                            isTruckConnected = !it.isTruckConnected,
                             isTruckInfo = TruckInfo(
                                 "Laranja",
                                 "ABC-1234",
