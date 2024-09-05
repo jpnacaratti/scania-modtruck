@@ -1,5 +1,6 @@
 package com.jpnacaratti.modtruck.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,7 +24,6 @@ import com.jpnacaratti.modtruck.ui.theme.DarkGray
 import com.jpnacaratti.modtruck.ui.theme.LightGray
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
 import com.jpnacaratti.modtruck.ui.theme.White
-import com.jpnacaratti.modtruck.utils.BackgroundBlurLayer
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider.Companion.poppins
 
@@ -38,19 +39,21 @@ fun TruckOverviewCard(state: HomeScreenUiState, modifier: Modifier = Modifier) {
         modifier = modifier
             .size(size = 330.dp)
             .clip(shape = RoundedCornerShape(40.dp))
+            .background(color = DarkGray)
+            .alpha(0.8f)
     ) {
-        BackgroundBlurLayer(blurRadius = 9,
-            backgroundColor = DarkGray,
-            backgroundColorAlpha = 0.8f,
-            state.onFirstCardBlurReady
-        )
-
-        if (!state.isFirstCardBlurReady) return
+//        BackgroundBlurLayer(blurRadius = 9,
+//            backgroundColor = DarkGray,
+//            backgroundColorAlpha = 0.8f,
+//            state.onFirstCardBlurReady
+//        )
+//
+//        if (!state.isFirstCardBlurReady) return
 
         Column(
             modifier = Modifier
                 .padding(30.dp)
-                .fillMaxWidth()
+                .fillMaxWidth().alpha(1f)
         ) {
             Text(
                 "Overview",
