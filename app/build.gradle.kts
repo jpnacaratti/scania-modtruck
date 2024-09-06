@@ -62,6 +62,8 @@ dependencies {
     implementation(libs.ui.text.google.fonts)
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.kt.coil.gif)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

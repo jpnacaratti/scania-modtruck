@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.jpnacaratti.modtruck.ui.screens.HomeScreen
+import com.jpnacaratti.modtruck.ui.screens.ModulesScreen
 import com.jpnacaratti.modtruck.ui.viewmodels.HomeScreenViewModel
 import com.jpnacaratti.modtruck.ui.viewmodels.TruckViewModel
 
@@ -23,7 +24,7 @@ fun BottomNavGraph(navController: NavHostController, truckViewModel: TruckViewMo
         }
 
         composable(route = BottomBarScreen.Modules.route) {
-            // TODO: Implement
+            ModulesScreen(truckViewModel = truckViewModel)
         }
     }
 }
