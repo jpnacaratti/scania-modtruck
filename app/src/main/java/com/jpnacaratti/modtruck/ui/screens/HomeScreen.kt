@@ -95,6 +95,7 @@ fun HomeScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier, st
         TruckOverviewCard(
             truckConnected = truckConnected,
             state = state,
+            truckInfo = truckViewModel.truckInfo.value,
             modifier = Modifier
                 .offset(y = overviewAnimationState.compOffsetY.dp)
                 .onGloballyPositioned { coordinates ->
@@ -142,12 +143,7 @@ fun HomeScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier, st
 @Composable
 private fun HomeScreenPreview() {
     val state = HomeScreenUiState(
-        isFirstCardBlurReady = true,
-        isTruckInfo = TruckInfo(
-            truckColor = "Laranja",
-            truckSign = "ABC-1234",
-            truckModel = "Scania 620S V8"
-        )
+        isFirstCardBlurReady = true
     )
 
     val viewModel = TruckViewModel()

@@ -1,6 +1,7 @@
 package com.jpnacaratti.modtruck.ui.animations
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
@@ -17,6 +18,7 @@ fun rememberBaseMoveAnimation(
     initialY: Float? = null,
     finalX: Float = 0F,
     finalY: Float = 0F,
+    easing: Easing = FastOutSlowInEasing,
     delayStart: Long = 0,
     onFinish: () -> Unit = {}
 ): BaseMoveAnimationState {
@@ -30,7 +32,7 @@ fun rememberBaseMoveAnimation(
         val xAnimation = if (initialX != null) {
             launch {
                 compOffsetX.animateTo(
-                    targetValue = finalX.toFloat(),
+                    targetValue = finalX,
                     animationSpec = tween(
                         durationMillis = duration,
                         easing = FastOutSlowInEasing
@@ -43,7 +45,7 @@ fun rememberBaseMoveAnimation(
         val yAnimation = if (initialY != null) {
             launch {
                 compOffsetY.animateTo(
-                    targetValue = finalY.toFloat(),
+                    targetValue = finalY,
                     animationSpec = tween(
                         durationMillis = duration,
                         easing = FastOutSlowInEasing

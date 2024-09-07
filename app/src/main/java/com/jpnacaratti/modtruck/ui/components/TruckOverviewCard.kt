@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.EXTRA_DATA
 import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.TRUCK_CONNECTED
+import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.TRUCK_INFO_RECEIVED
 import com.jpnacaratti.modtruck.models.TruckInfo
 import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
 import com.jpnacaratti.modtruck.ui.theme.DarkGray
@@ -35,14 +36,15 @@ import com.jpnacaratti.modtruck.utils.GoogleFontProvider.Companion.poppins
 fun TruckOverviewCard(
     truckConnected: Boolean,
     state: HomeScreenUiState,
+    truckInfo: TruckInfo?,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
 
-    val truckColor: String = state.isTruckInfo?.truckColor ?: "-/-"
-    val truckSign: String = state.isTruckInfo?.truckSign ?: "-/-"
+    val truckColor: String = truckInfo?.truckColor ?: "-/-"
+    val truckSign: String = truckInfo?.truckSign ?: "-/-"
 
-    val truckModel: String = state.isTruckInfo?.truckModel ?: "Nenhum caminhão conectado"
+    val truckModel: String = truckInfo?.truckModel ?: "Nenhum caminhão conectado"
 
     Box(
         modifier = modifier
@@ -84,6 +86,17 @@ fun TruckOverviewCard(
                         }
                         context.sendBroadcast(intent)
 
+                        val truckInfoIntent = Intent(TRUCK_INFO_RECEIVED).apply {
+                            putExtra(
+                                EXTRA_DATA, TruckInfo(
+                                    truckColor = "Laranja",
+                                    truckSign = "ABC-1234",
+                                    truckModel = "Scania 620S V8"
+                                )
+                            )
+                        }
+                        context.sendBroadcast(truckInfoIntent)
+
                         state.onConnectButtonClick
                     }
                 )
@@ -116,12 +129,12 @@ fun TruckOverviewCard(
 @Composable
 private fun TruckOverviewCardPreview() {
     val state = HomeScreenUiState(
-        isFirstCardBlurReady = true,
-        isTruckInfo = TruckInfo(
-            truckColor = "Laranja",
-            truckSign = "ABC-1234",
-            truckModel = "Scania 620S V8"
-        )
+        isFirstCardBlurReady = true
+    )
+    val truckInfo = TruckInfo(
+        truckColor = "Laranja",
+        truckSign = "ABC-1234",
+        truckModel = "Scania 620S V8"
     )
 
     GoogleFontProvider.initialize()
@@ -130,7 +143,7 @@ private fun TruckOverviewCardPreview() {
         Surface(
             color = DarkGray
         ) {
-            TruckOverviewCard(truckConnected = true, state = state)
+            TruckOverviewCard(truckConnected = true, state = state, truckInfo = truckInfo)
         }
     }
 }

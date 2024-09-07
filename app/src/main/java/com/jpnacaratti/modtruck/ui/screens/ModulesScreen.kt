@@ -2,7 +2,6 @@ package com.jpnacaratti.modtruck.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.res.painterResource
@@ -30,9 +30,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jpnacaratti.modtruck.ui.animations.rememberBaseAlphaAnimation
 import com.jpnacaratti.modtruck.ui.animations.rememberBaseMoveAnimation
+import com.jpnacaratti.modtruck.ui.components.ModulesOverview
 import com.jpnacaratti.modtruck.ui.theme.Black
-import com.jpnacaratti.modtruck.ui.theme.Gray
 import com.jpnacaratti.modtruck.ui.theme.LightBlue
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
 import com.jpnacaratti.modtruck.ui.viewmodels.TruckViewModel
@@ -47,6 +48,9 @@ fun ModulesScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier)
 
     var containerPosition by remember { mutableStateOf(0f) }
 
+    val initialDelayAlpha = 300L
+    val animationDurationAlpha = 225
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -54,9 +58,9 @@ fun ModulesScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier)
     ) {
 
         if (truckConnected.value) {
-            val overviewAnimationState = rememberBaseMoveAnimation(
+            val containerAnimationState = rememberBaseMoveAnimation(
                 duration = 1000,
-                initialX = containerPosition.plus(150.dp.value),
+                initialX = containerPosition.plus(220.dp.value),
                 finalX = containerPosition
             )
 
@@ -68,13 +72,12 @@ fun ModulesScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier)
                     .statusBarsPadding()
                     .height(426.dp)
                     .align(Alignment.TopEnd)
-                    .offset(y = 134.dp, x = overviewAnimationState.compOffsetX.dp)
+                    .offset(y = 134.dp, x = containerAnimationState.compOffsetX.dp)
                     .onGloballyPositioned { coordinates ->
                         containerPosition = coordinates.positionInParent().x
                     }
             )
         }
-
 
         Column(
             modifier = Modifier
@@ -82,10 +85,16 @@ fun ModulesScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier)
                 .statusBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            val titleAnimationState = rememberBaseAlphaAnimation(
+                duration = animationDurationAlpha,
+                delayStart = initialDelayAlpha
+            )
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 25.dp),
+                    .padding(top = 25.dp)
+                    .alpha(alpha = titleAnimationState.alpha),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -122,34 +131,14 @@ fun ModulesScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier)
                 // TODO: Implement a button to see all available modules
 
             } else {
-                Column(
-                    modifier = Modifier
-                        .align(alignment = Alignment.Start)
-                        .padding(top = 35.dp, start = 40.dp)
-                ) {
-                    Text(
-                        text = "${truckViewModel.getConnectedModulesCount()}",
-                        fontFamily = poppins(FontWeight.SemiBold),
-                        fontSize = 54.sp,
-                        color = Black
-                    )
-                    Text(
-                        text = "Módulos",
-                        fontFamily = poppins(FontWeight.Medium),
-                        fontSize = 17.sp,
-                        color = Black,
-                        modifier = Modifier.offset(y = (-12).dp)
-                    )
-                    Text(
-                        text = "Acoplados",
-                        fontFamily = poppins(FontWeight.Normal),
-                        fontSize = 16.sp,
-                        color = Gray,
-                        modifier = Modifier.offset(y = (-14).dp)
-                    )
-                }
-
-
+                ModulesOverview(
+                    animationDurationAlpha = animationDurationAlpha,
+                    initialDelayAlpha = initialDelayAlpha,
+                    connectedModulesCount = truckViewModel.getConnectedModulesCount(),
+                    modulesStatusIcon = truckViewModel.getAllModulesStatusIcon(),
+                    modulesStatusDescription = truckViewModel.getAllModulesStatusDescription(),
+                    modifier = Modifier.align(alignment = Alignment.Start)
+                )
             }
         }
     }
@@ -158,9 +147,12 @@ fun ModulesScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier)
 @Preview
 @Composable
 private fun ModulesScreenPreview() {
+    val truckViewModel = TruckViewModel()
+    truckViewModel.setTruckConnected(true)
+
     GoogleFontProvider.initialize()
 
     ModTruckTheme {
-        ModulesScreen(truckViewModel = TruckViewModel())
+        ModulesScreen(truckViewModel = truckViewModel)
     }
 }

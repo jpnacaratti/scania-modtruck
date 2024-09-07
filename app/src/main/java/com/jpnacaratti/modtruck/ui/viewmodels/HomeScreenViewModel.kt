@@ -19,15 +19,7 @@ class HomeScreenViewModel : ViewModel() {
                     _uiState.update { it.copy(isFirstCardBlurReady = true) }
                 },
                 onConnectButtonClick = {
-                    _uiState.update {
-                        it.copy(
-                            isTruckInfo = TruckInfo(
-                                "Laranja",
-                                "ABC-1234",
-                                "Scania 620S V8"
-                            )
-                        )
-                    }
+
                 },
                 onTruckSignStyleChange = { textLayoutResult ->
                     _uiState.update {

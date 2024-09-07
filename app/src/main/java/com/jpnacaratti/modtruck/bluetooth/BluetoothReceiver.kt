@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.EXTRA_DATA
 import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.TRUCK_CONNECTED
+import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.TRUCK_INFO_RECEIVED
+import com.jpnacaratti.modtruck.models.TruckInfo
 import com.jpnacaratti.modtruck.ui.viewmodels.TruckViewModel
 
 class BluetoothReceiver(private val viewModel: TruckViewModel): BroadcastReceiver() {
@@ -18,6 +20,11 @@ class BluetoothReceiver(private val viewModel: TruckViewModel): BroadcastReceive
                 val data = intent.getBooleanExtra(EXTRA_DATA, false)
 
                 viewModel.setTruckConnected(data)
+            }
+            TRUCK_INFO_RECEIVED -> {
+                val data = intent.getSerializableExtra(EXTRA_DATA) as TruckInfo?
+
+                viewModel.updateTruckInfo(data)
             }
         }
     }

@@ -24,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.TRUCK_CONNECTED
 import com.jpnacaratti.modtruck.bluetooth.BluetoothReceiver
+import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.TRUCK_INFO_RECEIVED
 import com.jpnacaratti.modtruck.ui.navigation.BottomBar
 import com.jpnacaratti.modtruck.ui.navigation.BottomNavGraph
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
@@ -63,6 +64,7 @@ class MainActivity : ComponentActivity() {
 
         val intentFilter = IntentFilter().apply {
             addAction(TRUCK_CONNECTED)
+            addAction(TRUCK_INFO_RECEIVED)
         }
 
         registerReceiver(bluetoothReceiver, intentFilter, Context.RECEIVER_NOT_EXPORTED)
