@@ -5,7 +5,13 @@ import com.jpnacaratti.modtruck.enums.ModuleStatus
 import com.jpnacaratti.modtruck.models.BatteryLevelModule
 import com.jpnacaratti.modtruck.models.EngineHealthModule
 import com.jpnacaratti.modtruck.models.EngineSoundModule
+import com.jpnacaratti.modtruck.models.ModuleAttribute
+import com.jpnacaratti.modtruck.models.ModuleStats
+import com.jpnacaratti.modtruck.models.ModuleStatusInfo
 import com.jpnacaratti.modtruck.models.TruckInfo
+import com.jpnacaratti.modtruck.ui.theme.Green
+import com.jpnacaratti.modtruck.ui.theme.Red
+import com.jpnacaratti.modtruck.ui.theme.Yellow
 import com.nacaratti.modtruck.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,14 +21,14 @@ class TruckViewModel : ViewModel() {
 
     // TODO: Remove these connect = true
     private val _batteryLevelModule =
-        MutableStateFlow(BatteryLevelModule(connected = true, batteryLevel = 75))
+        MutableStateFlow(BatteryLevelModule(connected = true, batteryLevel = 75, status = ModuleStatus.WARNING))
     val batteryLevelModule: StateFlow<BatteryLevelModule> = _batteryLevelModule.asStateFlow()
 
     private val _engineSoundModule = MutableStateFlow(EngineSoundModule(connected = true))
     val engineSoundModule: StateFlow<EngineSoundModule> = _engineSoundModule.asStateFlow()
 
     private val _engineHealthModule =
-        MutableStateFlow(EngineHealthModule(connected = true, rpm = 3000, temperature = 80F))
+        MutableStateFlow(EngineHealthModule(connected = true, rpm = 3143, temperature = 91F))
     val engineHealthModule: StateFlow<EngineHealthModule> = _engineHealthModule.asStateFlow()
 
     private val _truckInfo = MutableStateFlow<TruckInfo?>(null)
@@ -86,6 +92,151 @@ class TruckViewModel : ViewModel() {
             ModuleStatus.WARNING in statuses -> "Alguns módulos precisam de atenção!"
             else -> "Tudo em ordem com o seu caminhão"
         }
+    }
+
+    fun getAllModulesDetails(): List<ModuleStats> {
+        val toR = mutableListOf<ModuleStats>()
+
+        if (batteryLevelModule.value.connected) {
+            val information =
+                "Esse módulo tem como objetivo medir o nível da bateria dentro do caminhão Scania, ele pode exibir: 25%, 50%, 75% ou 100%."
+
+            val status = getBatteryLevelStatusInfo()
+
+            val stats = ModuleStats(
+                icon = R.drawable.battery_level_module,
+                title = "Bateria",
+                showDescription = "${batteryLevelModule.value.batteryLevel}%",
+                information = information,
+                statusIcon = status.icon,
+                statusIconColor = status.iconColor,
+                statusLevel = status.messageLevel,
+                statusDescription = status.description,
+                attributes = getBatteryModuleAttributes()
+            )
+
+            toR.add(stats)
+        }
+
+        if (engineHealthModule.value.connected) {
+            val information =
+                "Este módulo é responsável por monitorar o desgaste do motor através da medição de RPM e temperatura. Ele alerta caso detecte um desgaste excessivo, garantindo que o motor opere dentro dos padrões seguros."
+
+            val status = getEngineHealthStatusInfo()
+
+            val stats = ModuleStats(
+                icon = R.drawable.engine_health_module,
+                title = "Vida útil do motor",
+                showDescription = "${engineHealthModule.value.engineWear}%",
+                information = information,
+                statusIcon = status.icon,
+                statusIconColor = status.iconColor,
+                statusLevel = status.messageLevel,
+                statusDescription = status.description,
+                attributes = getEngineHealthAttributes()
+            )
+
+            toR.add(stats)
+        }
+
+        if (engineSoundModule.value.connected) {
+            val information =
+                "Este módulo tem como responsabilidade capturar o ruido sonoro produzido pelo motor e o analisar utilizando IA a fim de alertar caso o som esteja anormal."
+
+            val status = getEngineSoundStatusInfo()
+
+            val stats = ModuleStats(
+                icon = R.drawable.engine_sound_module,
+                title = "Som do motor",
+                showDescription = engineSoundModule.value.getCommonName(),
+                information = information,
+                statusIcon = status.icon,
+                statusIconColor = status.iconColor,
+                statusLevel = status.messageLevel,
+                statusDescription = status.description,
+                attributes = emptyList()
+            )
+
+            toR.add(stats)
+        }
+
+        return toR
+    }
+
+    private fun getBatteryLevelStatusInfo(): ModuleStatusInfo {
+        return when (batteryLevelModule.value.status) {
+            ModuleStatus.ERROR -> ModuleStatusInfo(
+                icon = R.drawable.icon_error,
+                iconColor = Red,
+                messageLevel = "Atenção: ",
+                description = "Bateria do caminhão extremamente BAIXA!"
+            )
+            ModuleStatus.WARNING -> ModuleStatusInfo(
+                icon = R.drawable.icon_warning,
+                iconColor = Yellow
+            )
+            else -> ModuleStatusInfo(
+                icon = R.drawable.icon_check,
+                iconColor = Green
+            )
+        }
+    }
+
+    private fun getEngineSoundStatusInfo(): ModuleStatusInfo {
+        return when (engineSoundModule.value.status) {
+            ModuleStatus.WARNING -> ModuleStatusInfo(
+                icon = R.drawable.icon_error,
+                iconColor = Red,
+                messageLevel = "Atenção: ",
+                description = "Motor apresentando ruidos anormais, leve a um mecânico o mais rápido possível!"
+            )
+            else -> ModuleStatusInfo(
+                icon = R.drawable.icon_check,
+                iconColor = Green,
+                description = "Sem ruidos anormais"
+            )
+        }
+    }
+
+    private fun getEngineHealthStatusInfo(): ModuleStatusInfo {
+        return when (engineHealthModule.value.status) {
+            ModuleStatus.ERROR -> ModuleStatusInfo(
+                icon = R.drawable.icon_error,
+                iconColor = Red,
+                messageLevel = "Atenção: ",
+                description = "Motor com ALTO nível de desgaste, leve a uma assistência IMEDIATAMENTE!"
+            )
+            ModuleStatus.WARNING -> ModuleStatusInfo(
+                icon = R.drawable.icon_warning,
+                iconColor = Yellow
+            )
+            else -> ModuleStatusInfo(
+                icon = R.drawable.icon_check,
+                iconColor = Green
+            )
+        }
+    }
+
+    private fun getBatteryModuleAttributes(): List<ModuleAttribute> {
+        return listOf(
+            ModuleAttribute(
+                attribute = "Bateria: ",
+                value = "${batteryLevelModule.value.batteryLevel}%"
+            )
+        )
+    }
+
+    private fun getEngineHealthAttributes(): List<ModuleAttribute> {
+        return listOf(
+            ModuleAttribute(
+                attribute = "RPM do motor: ",
+                value = "${engineHealthModule.value.rpm}"
+            ),
+            ModuleAttribute(
+                attribute = "Temperatura do motor: ",
+                value = "${engineHealthModule.value.temperature}º C"
+            )
+        )
     }
 
 }

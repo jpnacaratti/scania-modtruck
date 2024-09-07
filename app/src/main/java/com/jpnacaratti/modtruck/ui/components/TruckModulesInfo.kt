@@ -30,9 +30,9 @@ fun TruckModulesInfo(truckViewModel: TruckViewModel, modifier: Modifier = Modifi
         ),
         ModuleData(
             module = truckViewModel.engineHealthModule.value,
-            icon = painterResource(R.drawable.engine_wear_module),
+            icon = painterResource(R.drawable.engine_health_module),
             title = "Vida útil do motor",
-            value = "${truckViewModel.engineHealthModule.value.engineWear.roundToInt()}%"
+            value = "${truckViewModel.engineHealthModule.value.engineWear}%"
         ),
         ModuleData(
             module = truckViewModel.engineSoundModule.value,

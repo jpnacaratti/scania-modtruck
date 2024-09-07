@@ -68,24 +68,23 @@ fun BottomBar(navController: NavController) {
                             .clip(shape = CircleShape)
                             .fillMaxHeight()
                             .width(if (selected) 75.dp else 60.dp)
-                            .background(color = if (selected) DarkBlue else Color.Transparent),
+                            .background(color = if (selected) DarkBlue else Color.Transparent)
+                            .clickable {
+                                navController.navigate(screen.route) {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    restoreState = true
+                                    launchSingleTop = true
+                                }
+                            },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = screen.icon,
                             tint = if (selected) White else Gray,
                             contentDescription = "Navigation icon",
-                            modifier = Modifier
-                                .size(25.dp)
-                                .clickable {
-                                    navController.navigate(screen.route) {
-                                        popUpTo(navController.graph.startDestinationId) {
-                                            saveState = true
-                                        }
-                                        restoreState = true
-                                        launchSingleTop = true
-                                    }
-                                }
+                            modifier = Modifier.size(25.dp)
                         )
                     }
                 }
