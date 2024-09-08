@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,6 +37,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
@@ -46,6 +49,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jpnacaratti.modtruck.ui.animations.rememberBaseMoveAnimation
 import com.jpnacaratti.modtruck.ui.theme.Charcoal
 import com.jpnacaratti.modtruck.ui.theme.Graphite
 import com.jpnacaratti.modtruck.ui.theme.Gray
@@ -63,6 +67,7 @@ fun ModuleDetail(
     icon: Int,
     title: String,
     description: String,
+    delayAnimationStart: Long,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
@@ -74,11 +79,23 @@ fun ModuleDetail(
     val interactionSource = remember { MutableInteractionSource() }
     val indication = rememberRipple(bounded = true, color = Color.LightGray, radius = 500.dp)
 
+    var containerPosition by remember { mutableStateOf(0f) }
+
+    val animationState = rememberBaseMoveAnimation(
+        duration = 750,
+        delayStart = delayAnimationStart,
+        initialY = containerPosition.plus(500.dp.value)
+    )
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 95.dp)
             .padding(horizontal = 34.dp)
+            .offset(y = animationState.compOffsetY.dp)
+            .onGloballyPositioned { coordinates ->
+                containerPosition = coordinates.positionInParent().y
+            }
             .animateContentSize(
                 animationSpec = tween(
                     durationMillis = 300,
@@ -176,7 +193,8 @@ private fun ModuleDetailPreview() {
         ModuleDetail(
             icon = R.drawable.engine_health_module,
             title = "Vida útil do motor",
-            description = "11%"
+            description = "11%",
+            delayAnimationStart = 0L
         ) {
             Column {
                 Text(

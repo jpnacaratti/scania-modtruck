@@ -33,6 +33,7 @@ fun ModulesStatusInfo(
             icon = info.icon,
             title = info.title,
             description = info.showDescription,
+            delayAnimationStart = index * 150L + 400L,
             modifier = Modifier.padding(top = if (index == 0) 0.dp else 15.dp)
         ) {
             Column {
