@@ -20,7 +20,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -44,7 +46,9 @@ fun BottomBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    Box(modifier = Modifier.fillMaxWidth().height(120.dp)) {
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .height(120.dp)) {
         Box(
             modifier = Modifier
                 .clip(shape = RoundedCornerShape(size = 35.dp))
@@ -81,7 +85,7 @@ fun BottomBar(navController: NavController) {
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = screen.icon,
+                            imageVector = ImageVector.vectorResource(id = if (selected) screen.iconSelected else screen.iconUnselected),
                             tint = if (selected) White else Gray,
                             contentDescription = "Navigation icon",
                             modifier = Modifier.size(25.dp)
