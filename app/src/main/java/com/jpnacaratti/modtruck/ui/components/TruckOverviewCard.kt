@@ -21,8 +21,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.EXTRA_DATA
+import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.SMARTBOX_INFO_RECEIVED
 import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.TRUCK_CONNECTED
 import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.TRUCK_INFO_RECEIVED
+import com.jpnacaratti.modtruck.models.SmartBoxInfo
 import com.jpnacaratti.modtruck.models.TruckInfo
 import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
 import com.jpnacaratti.modtruck.ui.theme.DarkGray
@@ -96,6 +98,18 @@ fun TruckOverviewCard(
                             )
                         }
                         context.sendBroadcast(truckInfoIntent)
+
+                        val smartboxInfoIntent = Intent(SMARTBOX_INFO_RECEIVED).apply {
+                            putExtra(
+                                EXTRA_DATA, SmartBoxInfo(
+                                    model = "SmartBox P6 3.0",
+                                    serialNumber = "D8P28VMXJA",
+                                    numPorts = 6,
+                                    usedPorts = 3
+                                )
+                            )
+                        }
+                        context.sendBroadcast(smartboxInfoIntent)
 
                         state.onConnectButtonClick
                     }

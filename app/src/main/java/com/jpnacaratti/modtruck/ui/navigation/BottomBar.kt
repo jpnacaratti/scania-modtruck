@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -28,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.jpnacaratti.modtruck.ui.theme.DarkBlue
 import com.jpnacaratti.modtruck.ui.theme.Gray
 import com.jpnacaratti.modtruck.ui.theme.LightDarkBlue
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
@@ -72,7 +72,7 @@ fun BottomBar(navController: NavController) {
                             .clip(shape = CircleShape)
                             .fillMaxHeight()
                             .width(if (selected) 75.dp else 60.dp)
-                            .background(color = if (selected) DarkBlue else Color.Transparent)
+                            .background(color = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent)
                             .clickable {
                                 navController.navigate(screen.route) {
                                     popUpTo(navController.graph.startDestinationId) {

@@ -8,6 +8,7 @@ import com.jpnacaratti.modtruck.models.EngineSoundModule
 import com.jpnacaratti.modtruck.models.ModuleAttribute
 import com.jpnacaratti.modtruck.models.ModuleStats
 import com.jpnacaratti.modtruck.models.ModuleStatusInfo
+import com.jpnacaratti.modtruck.models.SmartBoxInfo
 import com.jpnacaratti.modtruck.models.TruckInfo
 import com.jpnacaratti.modtruck.ui.theme.Green
 import com.jpnacaratti.modtruck.ui.theme.Red
@@ -34,8 +35,15 @@ class TruckViewModel : ViewModel() {
     private val _truckInfo = MutableStateFlow<TruckInfo?>(null)
     val truckInfo: StateFlow<TruckInfo?> = _truckInfo.asStateFlow()
 
+    private val _smartBoxInfo = MutableStateFlow<SmartBoxInfo?>(null)
+    val smartBoxInfo: StateFlow<SmartBoxInfo?> = _smartBoxInfo.asStateFlow()
+
     private val _truckConnected = MutableStateFlow(false)
     val truckConnected: StateFlow<Boolean> = _truckConnected.asStateFlow()
+
+    // TODO: Save and get this from preferences
+    private val _hasConnectedBefore = MutableStateFlow(false)
+    val hasConnectedBefore: StateFlow<Boolean> = _hasConnectedBefore.asStateFlow()
 
     fun setTruckConnected(value: Boolean) {
         _truckConnected.value = value
@@ -43,6 +51,10 @@ class TruckViewModel : ViewModel() {
 
     fun updateTruckInfo(truckInfo: TruckInfo?) {
         _truckInfo.value = truckInfo
+    }
+
+    fun updateSmartBoxInfo(smartBoxInfo: SmartBoxInfo?) {
+        _smartBoxInfo.value = smartBoxInfo
     }
 
     fun getConnectedModulesCount(): Int {
@@ -92,6 +104,10 @@ class TruckViewModel : ViewModel() {
             ModuleStatus.WARNING in statuses -> "Alguns módulos precisam de atenção!"
             else -> "Tudo em ordem com o seu caminhão"
         }
+    }
+
+    fun getDrivenHours(): Int {
+        return 550 // TODO: Get real driven hours
     }
 
     fun getAllModulesDetails(): List<ModuleStats> {
@@ -171,10 +187,12 @@ class TruckViewModel : ViewModel() {
                 messageLevel = "Atenção: ",
                 description = "Bateria do caminhão extremamente BAIXA!"
             )
+
             ModuleStatus.WARNING -> ModuleStatusInfo(
                 icon = R.drawable.icon_warning,
                 iconColor = Yellow
             )
+
             else -> ModuleStatusInfo(
                 icon = R.drawable.icon_check,
                 iconColor = Green
@@ -190,6 +208,7 @@ class TruckViewModel : ViewModel() {
                 messageLevel = "Atenção: ",
                 description = "Motor apresentando ruidos anormais, leve a um mecânico o mais rápido possível!"
             )
+
             else -> ModuleStatusInfo(
                 icon = R.drawable.icon_check,
                 iconColor = Green,
@@ -206,10 +225,12 @@ class TruckViewModel : ViewModel() {
                 messageLevel = "Atenção: ",
                 description = "Motor com ALTO nível de desgaste, leve a uma assistência IMEDIATAMENTE!"
             )
+
             ModuleStatus.WARNING -> ModuleStatusInfo(
                 icon = R.drawable.icon_warning,
                 iconColor = Yellow
             )
+
             else -> ModuleStatusInfo(
                 icon = R.drawable.icon_check,
                 iconColor = Green

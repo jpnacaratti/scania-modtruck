@@ -22,14 +22,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.TRUCK_CONNECTED
 import com.jpnacaratti.modtruck.bluetooth.BluetoothReceiver
+import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.SMARTBOX_INFO_RECEIVED
+import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.TRUCK_CONNECTED
 import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.TRUCK_INFO_RECEIVED
 import com.jpnacaratti.modtruck.ui.navigation.BottomBar
 import com.jpnacaratti.modtruck.ui.navigation.BottomNavGraph
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
 import com.jpnacaratti.modtruck.ui.viewmodels.HomeScreenViewModel
 import com.jpnacaratti.modtruck.ui.viewmodels.TruckViewModel
+import com.jpnacaratti.modtruck.ui.viewmodels.UserViewModel
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider
 
 class MainActivity : ComponentActivity() {
@@ -50,10 +52,12 @@ class MainActivity : ComponentActivity() {
             WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
 
         val screenViewModel by viewModels<HomeScreenViewModel>()
+        val userViewModel by viewModels<UserViewModel>()
 
         setContent {
             ModTruck(
                 truckViewModel = truckViewModel,
+                userViewModel = userViewModel,
                 homeScreenViewModel = screenViewModel
             )
         }
@@ -65,6 +69,7 @@ class MainActivity : ComponentActivity() {
         val intentFilter = IntentFilter().apply {
             addAction(TRUCK_CONNECTED)
             addAction(TRUCK_INFO_RECEIVED)
+            addAction(SMARTBOX_INFO_RECEIVED)
         }
 
         registerReceiver(bluetoothReceiver, intentFilter, Context.RECEIVER_NOT_EXPORTED)
@@ -72,7 +77,11 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun ModTruck(truckViewModel: TruckViewModel, homeScreenViewModel: HomeScreenViewModel) {
+fun ModTruck(
+    truckViewModel: TruckViewModel,
+    userViewModel: UserViewModel,
+    homeScreenViewModel: HomeScreenViewModel
+) {
     val navController = rememberNavController()
 
     ModTruckTheme {
@@ -99,6 +108,7 @@ fun ModTruck(truckViewModel: TruckViewModel, homeScreenViewModel: HomeScreenView
                 BottomNavGraph(
                     navController = navController,
                     truckViewModel = truckViewModel,
+                    userViewModel = userViewModel,
                     homeScreenViewModel = homeScreenViewModel
                 )
             }
@@ -109,5 +119,9 @@ fun ModTruck(truckViewModel: TruckViewModel, homeScreenViewModel: HomeScreenView
 @Preview(showBackground = true)
 @Composable
 fun AppPreview() {
-    ModTruck(truckViewModel = TruckViewModel(), homeScreenViewModel = HomeScreenViewModel())
+    ModTruck(
+        truckViewModel = TruckViewModel(),
+        userViewModel = UserViewModel(),
+        homeScreenViewModel = HomeScreenViewModel()
+    )
 }
