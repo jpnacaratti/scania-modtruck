@@ -47,6 +47,7 @@ fun HomeScreen(truckViewModel: TruckViewModel, screenViewModel: HomeScreenViewMo
 @Composable
 fun HomeScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier, state: HomeScreenUiState = HomeScreenUiState()) {
     val truckConnected by truckViewModel.truckConnected.collectAsState()
+    val truckInfo by truckViewModel.truckInfo.collectAsState()
 
     var overviewCardPosition by remember { mutableStateOf(0f) }
     var infoCardPosition by remember { mutableStateOf(0f) }
@@ -95,7 +96,7 @@ fun HomeScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier, st
         TruckOverviewCard(
             truckConnected = truckConnected,
             state = state,
-            truckInfo = truckViewModel.truckInfo.value,
+            truckInfo = truckInfo,
             modifier = Modifier
                 .offset(y = overviewAnimationState.compOffsetY.dp)
                 .onGloballyPositioned { coordinates ->

@@ -13,12 +13,13 @@ import com.jpnacaratti.modtruck.models.TruckInfo
 import com.jpnacaratti.modtruck.ui.theme.Green
 import com.jpnacaratti.modtruck.ui.theme.Red
 import com.jpnacaratti.modtruck.ui.theme.Yellow
+import com.jpnacaratti.modtruck.utils.UserPreferences
 import com.nacaratti.modtruck.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class TruckViewModel : ViewModel() {
+class TruckViewModel(private val preferences: UserPreferences? = null) : ViewModel() {
 
     // TODO: Remove these connect = true
     private val _batteryLevelModule =
@@ -42,14 +43,25 @@ class TruckViewModel : ViewModel() {
     val truckConnected: StateFlow<Boolean> = _truckConnected.asStateFlow()
 
     // TODO: Save and get this from preferences
-    private val _hasConnectedBefore = MutableStateFlow(false)
+    private val _hasConnectedBefore = MutableStateFlow(preferences?.getHasConnectedBefore() ?: true)
     val hasConnectedBefore: StateFlow<Boolean> = _hasConnectedBefore.asStateFlow()
 
     fun setTruckConnected(value: Boolean) {
+        if (_truckConnected.value == value) {
+            return
+        }
+
         _truckConnected.value = value
+        if (preferences != null){
+            preferences.saveHasConnectBefore(true)
+        }
     }
 
     fun updateTruckInfo(truckInfo: TruckInfo?) {
+        if (_truckInfo.value == truckInfo) {
+            return
+        }
+
         _truckInfo.value = truckInfo
     }
 

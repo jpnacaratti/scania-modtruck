@@ -3,10 +3,6 @@ package com.jpnacaratti.modtruck.bluetooth
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.EXTRA_DATA
-import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.SMARTBOX_INFO_RECEIVED
-import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.TRUCK_CONNECTED
-import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.TRUCK_INFO_RECEIVED
 import com.jpnacaratti.modtruck.models.SmartBoxInfo
 import com.jpnacaratti.modtruck.models.TruckInfo
 import com.jpnacaratti.modtruck.ui.viewmodels.TruckViewModel
@@ -36,4 +32,10 @@ class BluetoothReceiver(private val viewModel: TruckViewModel): BroadcastReceive
         }
     }
 
+    companion object {
+        const val TRUCK_CONNECTED = "TRUCK_CONNECTED"
+        const val TRUCK_INFO_RECEIVED = "TRUCK_INFO_RECEIVED"
+        const val EXTRA_DATA = "EXTRA_DATA"
+        const val SMARTBOX_INFO_RECEIVED = "SMARTBOX_INFO_RECEIVED"
+    }
 }

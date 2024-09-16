@@ -20,10 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.EXTRA_DATA
-import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.SMARTBOX_INFO_RECEIVED
-import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.TRUCK_CONNECTED
-import com.jpnacaratti.modtruck.bluetooth.BluetoothService.Companion.TRUCK_INFO_RECEIVED
+import com.jpnacaratti.modtruck.bluetooth.BluetoothReceiver
 import com.jpnacaratti.modtruck.models.SmartBoxInfo
 import com.jpnacaratti.modtruck.models.TruckInfo
 import com.jpnacaratti.modtruck.ui.states.HomeScreenUiState
@@ -43,10 +40,10 @@ fun TruckOverviewCard(
 ) {
     val context = LocalContext.current
 
-    val truckColor: String = truckInfo?.truckColor ?: "-/-"
-    val truckSign: String = truckInfo?.truckSign ?: "-/-"
+    val truckColor: String = truckInfo?.color ?: "-/-"
+    val truckSign: String = truckInfo?.sign ?: "-/-"
 
-    val truckModel: String = truckInfo?.truckModel ?: "Nenhum caminhão conectado"
+    val truckModel: String = truckInfo?.model ?: "Nenhum caminhão conectado"
 
     Box(
         modifier = modifier
@@ -83,25 +80,25 @@ fun TruckOverviewCard(
                     onClickListener = {
 
                         // TODO: Remove this and change only when truck is connected
-                        val intent = Intent(TRUCK_CONNECTED).apply {
-                            putExtra(EXTRA_DATA, true)
+                        val intent = Intent(BluetoothReceiver.TRUCK_CONNECTED).apply {
+                            putExtra(BluetoothReceiver.EXTRA_DATA, true)
                         }
                         context.sendBroadcast(intent)
 
-                        val truckInfoIntent = Intent(TRUCK_INFO_RECEIVED).apply {
+                        val truckInfoIntent = Intent(BluetoothReceiver.TRUCK_INFO_RECEIVED).apply {
                             putExtra(
-                                EXTRA_DATA, TruckInfo(
-                                    truckColor = "Laranja",
-                                    truckSign = "ABC-1234",
-                                    truckModel = "Scania 620S V8"
+                                BluetoothReceiver.EXTRA_DATA, TruckInfo(
+                                    color = "Laranja",
+                                    sign = "ABC-1234",
+                                    model = "Scania 620S V8"
                                 )
                             )
                         }
                         context.sendBroadcast(truckInfoIntent)
 
-                        val smartboxInfoIntent = Intent(SMARTBOX_INFO_RECEIVED).apply {
+                        val smartboxInfoIntent = Intent(BluetoothReceiver.SMARTBOX_INFO_RECEIVED).apply {
                             putExtra(
-                                EXTRA_DATA, SmartBoxInfo(
+                                BluetoothReceiver.EXTRA_DATA, SmartBoxInfo(
                                     model = "SmartBox P6 3.0",
                                     serialNumber = "D8P28VMXJA",
                                     numPorts = 6,
@@ -146,9 +143,9 @@ private fun TruckOverviewCardPreview() {
         isFirstCardBlurReady = true
     )
     val truckInfo = TruckInfo(
-        truckColor = "Laranja",
-        truckSign = "ABC-1234",
-        truckModel = "Scania 620S V8"
+        color = "Laranja",
+        sign = "ABC-1234",
+        model = "Scania 620S V8"
     )
 
     GoogleFontProvider.initialize()
