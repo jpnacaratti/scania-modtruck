@@ -15,6 +15,8 @@ import android.bluetooth.*
 import android.bluetooth.le.*
 import android.os.Handler
 import android.os.Looper
+import com.jpnacaratti.modtruck.models.SmartBoxInfo
+import com.jpnacaratti.modtruck.models.TruckInfo
 import com.jpnacaratti.modtruck.utils.MessageBuilder
 import com.jpnacaratti.modtruck.utils.Utilities
 
@@ -37,6 +39,9 @@ class BluetoothService(private val context: Context) {
     private val DESCRIPTOR_UUID: UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb") // Scania ModTruck UUID
 
     private var bluetoothGatt: BluetoothGatt? = null
+    private val characteristicsToEnable = mutableListOf<BluetoothGattCharacteristic>()
+
+    private var isDeviceConnected = false
 
     private val truckInfoMessageBuilder: MessageBuilder = MessageBuilder(3)
     private val smartBoxMessageBuilder: MessageBuilder = MessageBuilder(3)
@@ -45,7 +50,7 @@ class BluetoothService(private val context: Context) {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             super.onScanResult(callbackType, result)
             val device = result.device
-            if (device.name == null) return
+            if (device.name == null || isDeviceConnected) return
             Log.d("BluetoothService", "Device found: ${device.name}")
 
             bluetoothAdapter?.bluetoothLeScanner?.stopScan(this)
@@ -84,14 +89,17 @@ class BluetoothService(private val context: Context) {
     }
 
     private fun connectToDevice(device: BluetoothDevice) {
-        bluetoothGatt = device.connectGatt(
-            context,
-            false,
-            gattCallback,
-            BluetoothDevice.TRANSPORT_LE,
-            BluetoothDevice.PHY_LE_1M_MASK,
-            handler
-        )
+        if (!isDeviceConnected) {
+            isDeviceConnected = true // Mark as connected before actually connecting
+            bluetoothGatt = device.connectGatt(
+                context,
+                false,
+                gattCallback,
+                BluetoothDevice.TRANSPORT_LE,
+                BluetoothDevice.PHY_LE_1M_MASK,
+                handler
+            )
+        }
     }
 
     private val gattCallback = object : BluetoothGattCallback() {
@@ -102,10 +110,14 @@ class BluetoothService(private val context: Context) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 Log.d("BluetoothService", "Device connected ${gatt.device.name}")
                 onDeviceConnected(gatt.device)
+
+                bluetoothAdapter?.bluetoothLeScanner?.stopScan(leScanCallback)
+
                 gatt.discoverServices()
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.d("BluetoothService", "Device disconnected ${gatt.device.name}")
                 onDeviceDisconnected(gatt.device)
+                isDeviceConnected = false
                 gatt.close()
             }
         }
@@ -116,16 +128,19 @@ class BluetoothService(private val context: Context) {
                 val service = gatt.getService(SERVICE_UUID)
                 if (service != null) {
                     val cTruckInfo = service.getCharacteristic(TRUCK_INFO_UUID)
+                    val cSmartBoxInfo = service.getCharacteristic(SMARTBOX_INFO_UUID)
                     if (cTruckInfo != null) {
-                        enableNotifications(gatt, cTruckInfo)
+                        characteristicsToEnable.add(cTruckInfo)
                     } else {
                         Log.e("BluetoothService", "TRUCK INFO characteristic not found")
                     }
-                    val cSmartBoxInfo = service.getCharacteristic(SMARTBOX_INFO_UUID)
                     if (cSmartBoxInfo != null) {
-                        enableNotifications(gatt, cSmartBoxInfo)
+                        characteristicsToEnable.add(cSmartBoxInfo)
                     } else {
                         Log.e("BluetoothService", "SMARTBOX INFO characteristic not found")
+                    }
+                    if (characteristicsToEnable.isNotEmpty()) {
+                        enableNextNotification(gatt)
                     }
                 } else {
                     Log.e("BluetoothService", "Service not found")
@@ -147,33 +162,65 @@ class BluetoothService(private val context: Context) {
                 }
             }
         }
+
+        override fun onDescriptorWrite(
+            gatt: BluetoothGatt,
+            descriptor: BluetoothGattDescriptor,
+            status: Int
+        ) {
+            super.onDescriptorWrite(gatt, descriptor, status)
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                characteristicsToEnable.removeFirstOrNull()
+                enableNextNotification(gatt)
+            } else {
+                Log.e("BluetoothService", "Failed to write descriptor: $status")
+            }
+        }
     }
 
-    private fun enableNotifications(
-        gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic
-    ) {
-        gatt.setCharacteristicNotification(characteristic, true)
-        val descriptor = characteristic.getDescriptor(DESCRIPTOR_UUID)
-        descriptor?.let {
-            it.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-            gatt.writeDescriptor(it)
+    private fun enableNextNotification(gatt: BluetoothGatt) {
+        if (characteristicsToEnable.isNotEmpty()) {
+            val characteristic = characteristicsToEnable.first()
+            gatt.setCharacteristicNotification(characteristic, true)
+            val descriptor = characteristic.getDescriptor(DESCRIPTOR_UUID)
+            descriptor?.let {
+                it.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                gatt.writeDescriptor(it)
+            }
         }
     }
 
     private fun onDataReceived(uuid: UUID, data: String) {
-        if (uuid == TRUCK_INFO_UUID) {
-            Log.d("BluetoothService", "Data received from TRUCK_INFO: $data")
+        //Log.d("BluetoothService", "Data received from ALL: $data")
+        when(uuid) {
+            SMARTBOX_INFO_UUID -> {
+                Log.d("BluetoothService", "Data received from SMARTBOX_INFO: $data")
 
-            truckInfoMessageBuilder.addFragment(data)
+                smartBoxMessageBuilder.addFragment(data)
 
-            val truckInfoJson = truckInfoMessageBuilder.build()
-            val truckInfo = Utilities.serializeJsonToTruckInfo(truckInfoJson)
-            if (truckInfo != null) {
-                Utilities.sendBroadcast(context, BluetoothReceiver.TRUCK_CONNECTED, true)
-                Utilities.sendBroadcast(context, BluetoothReceiver.TRUCK_INFO_RECEIVED, truckInfo)
+                val smartBoxInfoJson = smartBoxMessageBuilder.build()
+                val smartBoxInfo = Utilities.serializeJsonToObject<SmartBoxInfo>(smartBoxInfoJson)
+                if (smartBoxInfo != null) {
+                    Utilities.sendBroadcast(context, BluetoothReceiver.SMARTBOX_INFO_RECEIVED, smartBoxInfo)
 
-                truckInfoMessageBuilder.reset()
-                Log.d("BluetoothService", "Finished received TRUCK_INFO: $truckInfo")
+                    smartBoxMessageBuilder.reset()
+                    Log.d("BluetoothService", "Finished received SMARTBOX_INFO: $smartBoxInfo")
+                }
+            }
+            TRUCK_INFO_UUID -> {
+                Log.d("BluetoothService", "Data received from TRUCK_INFO: $data")
+
+                truckInfoMessageBuilder.addFragment(data)
+
+                val truckInfoJson = truckInfoMessageBuilder.build()
+                val truckInfo = Utilities.serializeJsonToObject<TruckInfo>(truckInfoJson)
+                if (truckInfo != null) {
+                    Utilities.sendBroadcast(context, BluetoothReceiver.TRUCK_CONNECTED, true)
+                    Utilities.sendBroadcast(context, BluetoothReceiver.TRUCK_INFO_RECEIVED, truckInfo)
+
+                    truckInfoMessageBuilder.reset()
+                    Log.d("BluetoothService", "Finished received TRUCK_INFO: $truckInfo")
+                }
             }
         }
     }
@@ -193,5 +240,6 @@ class BluetoothService(private val context: Context) {
         bluetoothGatt?.disconnect()
         bluetoothGatt?.close()
         bluetoothGatt = null
+        isDeviceConnected = false
     }
 }
