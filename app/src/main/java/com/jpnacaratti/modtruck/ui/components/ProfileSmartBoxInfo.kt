@@ -78,7 +78,7 @@ fun ProfileSmartBoxInfo(
                         withStyle(
                             style = valueStyle
                         ) {
-                            append(smartBoxInfo.serialNumber)
+                            append(smartBoxInfo.serial)
                         }
                     }
                 )
@@ -138,7 +138,7 @@ private fun ProfileSmartBoxInfoPreview() {
 
     val smartBoxInfo = SmartBoxInfo(
         model = "SmartBox P6 3.0",
-        serialNumber = "D8P28VMXJA",
+        serial = "D8P28VMXJA",
         numPorts = 6,
         usedPorts = 3
     )

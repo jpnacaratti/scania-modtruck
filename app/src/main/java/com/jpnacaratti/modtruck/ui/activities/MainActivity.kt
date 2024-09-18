@@ -37,6 +37,7 @@ import com.jpnacaratti.modtruck.ui.viewmodels.HomeScreenViewModel
 import com.jpnacaratti.modtruck.ui.viewmodels.TruckViewModel
 import com.jpnacaratti.modtruck.ui.viewmodels.UserViewModel
 import com.jpnacaratti.modtruck.utils.GoogleFontProvider
+import com.jpnacaratti.modtruck.utils.UserPreferences
 
 class MainActivity : ComponentActivity() {
 
@@ -58,6 +59,11 @@ class MainActivity : ComponentActivity() {
 
         val screenViewModel by viewModels<HomeScreenViewModel>()
         val userViewModel by viewModels<UserViewModel>()
+
+        val preferences = UserPreferences(this)
+        truckViewModel.setPreferences(preferences)
+        truckViewModel.updateHasConnectedBefore(preferences.getHasConnectedBefore())
+        truckViewModel.loadSmartBoxFromPreferences()
 
         setContent {
             ModTruck(

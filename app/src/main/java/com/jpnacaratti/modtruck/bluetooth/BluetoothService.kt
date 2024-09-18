@@ -90,7 +90,7 @@ class BluetoothService(private val context: Context) {
 
     private fun connectToDevice(device: BluetoothDevice) {
         if (!isDeviceConnected) {
-            isDeviceConnected = true // Mark as connected before actually connecting
+            isDeviceConnected = true
             bluetoothGatt = device.connectGatt(
                 context,
                 false,

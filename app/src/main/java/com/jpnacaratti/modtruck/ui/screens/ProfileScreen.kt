@@ -13,6 +13,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +39,8 @@ fun ProfileScreen(
     userViewModel: UserViewModel,
     modifier: Modifier = Modifier
 ) {
+    val connected = truckViewModel.truckConnected.collectAsState()
+
     Column(
         modifier = modifier
             .background(color = MaterialTheme.colorScheme.primary)
@@ -69,10 +72,14 @@ fun ProfileScreen(
                 .fillMaxWidth()
         )
 
-        if (truckViewModel.hasConnectedBefore.value || truckViewModel.truckConnected.value) {
+        if (truckViewModel.hasConnectedBefore.value || connected.value) {
+            val smartBoxInfo = truckViewModel.smartBoxInfo.collectAsState()
+
+            if (smartBoxInfo.value == null) return@Column
+
             ProfileSmartBoxInfo(
-                connected = truckViewModel.truckConnected.value,
-                smartBoxInfo = truckViewModel.smartBoxInfo.value!!,
+                connected = connected.value,
+                smartBoxInfo = smartBoxInfo.value!!,
                 modifier = Modifier.padding(
                     start = 30.dp,
                     end = 30.dp,

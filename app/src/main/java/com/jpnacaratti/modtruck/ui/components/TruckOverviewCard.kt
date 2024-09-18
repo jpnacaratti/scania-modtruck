@@ -100,7 +100,7 @@ fun TruckOverviewCard(
                             putExtra(
                                 BluetoothReceiver.EXTRA_DATA, SmartBoxInfo(
                                     model = "SmartBox P6 3.0",
-                                    serialNumber = "D8P28VMXJA",
+                                    serial = "D8P28VMXJA",
                                     numPorts = 6,
                                     usedPorts = 3
                                 )

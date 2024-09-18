@@ -19,7 +19,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class TruckViewModel(private val preferences: UserPreferences? = null) : ViewModel() {
+class TruckViewModel : ViewModel() {
+
+    // TODO: Inject this using hilt and singleton
+    private lateinit var preferences: UserPreferences
 
     // TODO: Remove these connect = true
     private val _batteryLevelModule =
@@ -43,7 +46,7 @@ class TruckViewModel(private val preferences: UserPreferences? = null) : ViewMod
     val truckConnected: StateFlow<Boolean> = _truckConnected.asStateFlow()
 
     // TODO: Save and get this from preferences
-    private val _hasConnectedBefore = MutableStateFlow(preferences?.getHasConnectedBefore() ?: true)
+    private val _hasConnectedBefore = MutableStateFlow(false)
     val hasConnectedBefore: StateFlow<Boolean> = _hasConnectedBefore.asStateFlow()
 
     fun setTruckConnected(value: Boolean) {
@@ -52,8 +55,9 @@ class TruckViewModel(private val preferences: UserPreferences? = null) : ViewMod
         }
 
         _truckConnected.value = value
-        if (preferences != null){
+        if (value && !_hasConnectedBefore.value) {
             preferences.saveHasConnectBefore(true)
+            _hasConnectedBefore.value = true
         }
     }
 
@@ -65,8 +69,41 @@ class TruckViewModel(private val preferences: UserPreferences? = null) : ViewMod
         _truckInfo.value = truckInfo
     }
 
+    fun updateHasConnectedBefore(value: Boolean) {
+        _hasConnectedBefore.value = value
+    }
+
     fun updateSmartBoxInfo(smartBoxInfo: SmartBoxInfo?) {
+        if (_smartBoxInfo.value == smartBoxInfo) {
+            return
+        }
+
+        preferences.saveSmartBoxModel(smartBoxInfo!!.model)
+        preferences.saveSmartBoxSerial(smartBoxInfo.serial)
+        preferences.saveSmartBoxNumPorts(smartBoxInfo.numPorts)
+        preferences.saveSmartBoxUsedPorts(smartBoxInfo.usedPorts)
+
         _smartBoxInfo.value = smartBoxInfo
+    }
+
+    fun setPreferences(preferences: UserPreferences) {
+        this.preferences = preferences
+    }
+
+    fun loadSmartBoxFromPreferences() {
+        val model = preferences.getSmartBoxModel()
+        val serial = preferences.getSmartBoxSerial()
+        val numPorts = preferences.getSmartBoxNumPorts()
+        val usedPorts = preferences.getSmartBoxUsedPorts()
+
+        if (model == null || serial == null) return
+
+        _smartBoxInfo.value = SmartBoxInfo(
+            model = model!!,
+            serial = serial!!,
+            numPorts = numPorts,
+            usedPorts = usedPorts
+        )
     }
 
     fun getConnectedModulesCount(): Int {

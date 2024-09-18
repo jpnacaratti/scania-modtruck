@@ -5,6 +5,7 @@ import android.content.Intent
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.jpnacaratti.modtruck.bluetooth.BluetoothReceiver
+import com.jpnacaratti.modtruck.models.SmartBoxInfo
 import com.jpnacaratti.modtruck.models.TruckInfo
 import java.io.Serializable
 
@@ -19,10 +20,10 @@ class Utilities {
             return sampleArray
         }
 
-        fun serializeJsonToTruckInfo(json: String): TruckInfo? {
+        inline fun <reified T> serializeJsonToObject(json: String): T? {
             val gson = Gson()
             return try {
-                gson.fromJson(json, TruckInfo::class.java)
+                gson.fromJson(json, T::class.java)
             } catch (e: JsonSyntaxException) {
                 null
             }
