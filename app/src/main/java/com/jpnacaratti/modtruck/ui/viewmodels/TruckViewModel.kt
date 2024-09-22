@@ -1,11 +1,13 @@
 package com.jpnacaratti.modtruck.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
+import com.jpnacaratti.modtruck.enums.ModuleName
 import com.jpnacaratti.modtruck.enums.ModuleStatus
 import com.jpnacaratti.modtruck.models.BatteryLevelModule
 import com.jpnacaratti.modtruck.models.EngineHealthModule
 import com.jpnacaratti.modtruck.models.EngineSoundModule
 import com.jpnacaratti.modtruck.models.ModuleAttribute
+import com.jpnacaratti.modtruck.models.ModuleInfo
 import com.jpnacaratti.modtruck.models.ModuleStats
 import com.jpnacaratti.modtruck.models.ModuleStatusInfo
 import com.jpnacaratti.modtruck.models.SmartBoxInfo
@@ -33,7 +35,7 @@ class TruckViewModel : ViewModel() {
     val engineSoundModule: StateFlow<EngineSoundModule> = _engineSoundModule.asStateFlow()
 
     private val _engineHealthModule =
-        MutableStateFlow(EngineHealthModule(connected = true, rpm = 3143, temperature = 91F))
+        MutableStateFlow(EngineHealthModule(connected = false, rpm = 3143, temperature = 91F))
     val engineHealthModule: StateFlow<EngineHealthModule> = _engineHealthModule.asStateFlow()
 
     private val _truckInfo = MutableStateFlow<TruckInfo?>(null)
@@ -45,7 +47,6 @@ class TruckViewModel : ViewModel() {
     private val _truckConnected = MutableStateFlow(false)
     val truckConnected: StateFlow<Boolean> = _truckConnected.asStateFlow()
 
-    // TODO: Save and get this from preferences
     private val _hasConnectedBefore = MutableStateFlow(false)
     val hasConnectedBefore: StateFlow<Boolean> = _hasConnectedBefore.asStateFlow()
 
@@ -86,6 +87,67 @@ class TruckViewModel : ViewModel() {
         _smartBoxInfo.value = smartBoxInfo
     }
 
+    fun updateModuleInfo(moduleInfo: ModuleInfo?) {
+        if (moduleInfo == null) return
+
+        when(moduleInfo.module) {
+            ModuleName.BATTERY_LEVEL.name -> {
+                updateBatteryLevelModule(moduleInfo.info.toInt())
+            }
+            ModuleName.ENGINE_SOUND.name -> {
+                updateSoundModule(ModuleStatus.valueOf(moduleInfo.info))
+            }
+            ModuleName.ENGINE_HEALTH.name -> {
+                updateEngineHealthModule(moduleInfo.info.split(";")[0].toInt(), moduleInfo.info.split(";")[1].toFloat())
+            }
+        }
+    }
+
+    private fun updateBatteryLevelModule(value: Int) {
+        var status = ModuleStatus.OK
+        if (value <= 70) {
+            status = ModuleStatus.WARNING
+        }
+        if (value <= 30) {
+            status = ModuleStatus.ERROR
+        }
+
+        _batteryLevelModule.value = BatteryLevelModule(
+            connected = true,
+            batteryLevel = value,
+            status = status
+        )
+    }
+
+    private fun updateSoundModule(status: ModuleStatus) {
+        _engineSoundModule.value = EngineSoundModule(
+            connected = true,
+            status = status
+        )
+    }
+
+    private fun updateEngineHealthModule(rpm: Int, temperature: Float) {
+        val cache = EngineHealthModule(
+            rpm = rpm,
+            temperature = temperature
+        )
+
+        var status = ModuleStatus.OK
+        if (cache.engineWear <= 70) {
+            status = ModuleStatus.WARNING
+        }
+        if (cache.engineWear <= 35) {
+            status = ModuleStatus.ERROR
+        }
+
+        _engineHealthModule.value = EngineHealthModule(
+            connected = true,
+            rpm = rpm,
+            temperature = temperature,
+            status = status
+        )
+    }
+
     fun setPreferences(preferences: UserPreferences) {
         this.preferences = preferences
     }
@@ -99,8 +161,8 @@ class TruckViewModel : ViewModel() {
         if (model == null || serial == null) return
 
         _smartBoxInfo.value = SmartBoxInfo(
-            model = model!!,
-            serial = serial!!,
+            model = model,
+            serial = serial,
             numPorts = numPorts,
             usedPorts = usedPorts
         )

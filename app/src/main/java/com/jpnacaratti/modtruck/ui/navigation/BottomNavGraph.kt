@@ -22,7 +22,15 @@ fun BottomNavGraph(navController: NavHostController, truckViewModel: TruckViewMo
         }
 
         composable(route = BottomBarScreen.Home.route) {
-            HomeScreen(truckViewModel = truckViewModel, screenViewModel = homeScreenViewModel)
+            HomeScreen(onNavigateToModules = {
+                navController.navigate(BottomBarScreen.Modules.route) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        saveState = true
+                    }
+                    restoreState = true
+                    launchSingleTop = true
+                }
+            }, truckViewModel = truckViewModel, screenViewModel = homeScreenViewModel)
         }
 
         composable(route = BottomBarScreen.Modules.route) {

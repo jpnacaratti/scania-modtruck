@@ -17,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +50,15 @@ import com.nacaratti.modtruck.R
 @Composable
 fun ModulesScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier) {
     val truckConnected = truckViewModel.truckConnected.collectAsState()
+    val batteryLevel = truckViewModel.batteryLevelModule.collectAsState()
+    val engineSound = truckViewModel.engineSoundModule.collectAsState()
+    val engineHealth = truckViewModel.engineHealthModule.collectAsState()
+
+    // TODO: WA (remove later)
+    var forceRecompose by remember { mutableStateOf(0) }
+    LaunchedEffect(batteryLevel.value, engineSound.value, engineHealth.value) {
+        forceRecompose++
+    }
 
     var containerPosition by remember { mutableStateOf(0f) }
 

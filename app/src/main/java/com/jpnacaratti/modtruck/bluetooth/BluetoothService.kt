@@ -15,6 +15,7 @@ import android.bluetooth.*
 import android.bluetooth.le.*
 import android.os.Handler
 import android.os.Looper
+import com.jpnacaratti.modtruck.models.ModuleInfo
 import com.jpnacaratti.modtruck.models.SmartBoxInfo
 import com.jpnacaratti.modtruck.models.TruckInfo
 import com.jpnacaratti.modtruck.utils.MessageBuilder
@@ -35,6 +36,7 @@ class BluetoothService(private val context: Context) {
     // Arduino characteristics UUIDs
     private val TRUCK_INFO_UUID: UUID = UUID.fromString("abcdef01-1234-5678-1234-56789abcdef1")
     private val SMARTBOX_INFO_UUID: UUID = UUID.fromString("abcdef02-1234-5678-1234-56789abcdef2")
+    private val MODULE_INFO_UUID: UUID = UUID.fromString("abcdef03-1234-5678-1234-56789abcdef3")
 
     private val DESCRIPTOR_UUID: UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb") // Scania ModTruck UUID
 
@@ -45,6 +47,7 @@ class BluetoothService(private val context: Context) {
 
     private val truckInfoMessageBuilder: MessageBuilder = MessageBuilder(3)
     private val smartBoxMessageBuilder: MessageBuilder = MessageBuilder(3)
+    private val moduleInfoMessageBuilder: MessageBuilder = MessageBuilder(3)
 
     private val leScanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -85,7 +88,7 @@ class BluetoothService(private val context: Context) {
 
         handler.postDelayed({
             bluetoothLeScanner?.stopScan(leScanCallback)
-        }, 10000)
+        }, 6000000)
     }
 
     private fun connectToDevice(device: BluetoothDevice) {
@@ -129,6 +132,7 @@ class BluetoothService(private val context: Context) {
                 if (service != null) {
                     val cTruckInfo = service.getCharacteristic(TRUCK_INFO_UUID)
                     val cSmartBoxInfo = service.getCharacteristic(SMARTBOX_INFO_UUID)
+                    val cModuleInfo = service.getCharacteristic(MODULE_INFO_UUID)
                     if (cTruckInfo != null) {
                         characteristicsToEnable.add(cTruckInfo)
                     } else {
@@ -138,6 +142,11 @@ class BluetoothService(private val context: Context) {
                         characteristicsToEnable.add(cSmartBoxInfo)
                     } else {
                         Log.e("BluetoothService", "SMARTBOX INFO characteristic not found")
+                    }
+                    if (cModuleInfo != null) {
+                        characteristicsToEnable.add(cModuleInfo)
+                    } else {
+                        Log.e("BluetoothService", "MODULE INFO characteristic not found")
                     }
                     if (characteristicsToEnable.isNotEmpty()) {
                         enableNextNotification(gatt)
@@ -222,6 +231,20 @@ class BluetoothService(private val context: Context) {
                     Log.d("BluetoothService", "Finished received TRUCK_INFO: $truckInfo")
                 }
             }
+            MODULE_INFO_UUID -> {
+                Log.d("BluetoothService", "Data received from MODULE_INFO: $data")
+
+                moduleInfoMessageBuilder.addFragment(data)
+
+                val moduleInfoJson = moduleInfoMessageBuilder.build()
+                val moduleInfo = Utilities.serializeJsonToObject<ModuleInfo>(moduleInfoJson)
+                if (moduleInfo != null) {
+                    Utilities.sendBroadcast(context, BluetoothReceiver.MODULE_INFO_RECEIVED, moduleInfo)
+
+                    moduleInfoMessageBuilder.reset()
+                    Log.d("BluetoothService", "Finished received MODULE_INFO: $moduleInfo")
+                }
+            }
         }
     }
 
@@ -233,6 +256,7 @@ class BluetoothService(private val context: Context) {
         Utilities.sendBroadcast(context, BluetoothReceiver.TRUCK_CONNECTED, false)
         Log.d("BluetoothService", "Device disconnected: ${device.name}")
         bluetoothGatt = null
+        isDeviceConnected = false
     }
 
     fun stopService() {

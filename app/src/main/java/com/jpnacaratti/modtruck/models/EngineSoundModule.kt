@@ -11,7 +11,7 @@ data class EngineSoundModule(
     fun getCommonName(): String {
         return when (status) {
             ModuleStatus.OK -> "Sem ruidos anormais"
-            ModuleStatus.WARNING -> "Ruidos anormais detectados"
+            ModuleStatus.WARNING -> "Ruidos anormais"
             ModuleStatus.ERROR -> "N/A" // TODO: Implement control for this time
         }
     }

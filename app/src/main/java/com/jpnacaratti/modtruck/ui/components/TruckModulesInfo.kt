@@ -21,7 +21,7 @@ import kotlin.math.roundToInt
 @Composable
 fun TruckModulesInfo(truckViewModel: TruckViewModel, modifier: Modifier = Modifier) {
 
-    val modules = listOf(
+    var modules = listOf(
         ModuleData(
             module = truckViewModel.batteryLevelModule.value,
             icon = painterResource(R.drawable.battery_level_module),
@@ -42,8 +42,10 @@ fun TruckModulesInfo(truckViewModel: TruckViewModel, modifier: Modifier = Modifi
         )
     )
 
+    modules = modules.filter { it.module.connected }.toList()
+
     Column(modifier = modifier) {
-        modules.filter { it.module.connected }.forEachIndexed { index, moduleData ->
+        modules.forEachIndexed { index, moduleData ->
             ModuleInfoComponent(
                 icon = moduleData.icon,
                 title = moduleData.title,

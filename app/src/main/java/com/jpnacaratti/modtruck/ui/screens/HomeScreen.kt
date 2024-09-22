@@ -25,7 +25,6 @@ import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jpnacaratti.modtruck.models.TruckInfo
 import com.jpnacaratti.modtruck.ui.animations.rememberBaseMoveAnimation
 import com.jpnacaratti.modtruck.ui.animations.rememberTruckEntryAnimation
 import com.jpnacaratti.modtruck.ui.components.TruckInfoCard
@@ -39,13 +38,13 @@ import com.jpnacaratti.modtruck.utils.GoogleFontProvider
 import com.nacaratti.modtruck.R
 
 @Composable
-fun HomeScreen(truckViewModel: TruckViewModel, screenViewModel: HomeScreenViewModel, modifier: Modifier = Modifier) {
+fun HomeScreen(onNavigateToModules: () -> Unit, truckViewModel: TruckViewModel, screenViewModel: HomeScreenViewModel, modifier: Modifier = Modifier) {
     val uiState by screenViewModel.uiState.collectAsState()
-    HomeScreen(truckViewModel = truckViewModel, modifier = modifier, state = uiState)
+    HomeScreen(onNavigateToModules = onNavigateToModules, truckViewModel = truckViewModel, modifier = modifier, state = uiState)
 }
 
 @Composable
-fun HomeScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier, state: HomeScreenUiState = HomeScreenUiState()) {
+fun HomeScreen(onNavigateToModules: () -> Unit, truckViewModel: TruckViewModel, modifier: Modifier = Modifier, state: HomeScreenUiState = HomeScreenUiState()) {
     val truckConnected by truckViewModel.truckConnected.collectAsState()
     val truckInfo by truckViewModel.truckInfo.collectAsState()
 
@@ -130,6 +129,7 @@ fun HomeScreen(truckViewModel: TruckViewModel, modifier: Modifier = Modifier, st
         )
 
         TruckViewModulesCard(
+            onNavigateToModules,
             modifier = Modifier
                 .padding(top = 20.dp, bottom = 100.dp)
                 .offset(y = modulesAnimationState.compOffsetY.dp)
@@ -152,6 +152,6 @@ private fun HomeScreenPreview() {
     GoogleFontProvider.initialize()
 
     ModTruckTheme {
-        HomeScreen(truckViewModel = viewModel, state = state)
+        HomeScreen(onNavigateToModules = {}, truckViewModel = viewModel, state = state)
     }
 }

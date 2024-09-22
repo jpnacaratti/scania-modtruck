@@ -29,7 +29,7 @@ import com.jpnacaratti.modtruck.utils.GoogleFontProvider.Companion.poppins
 import com.nacaratti.modtruck.R
 
 @Composable
-fun TruckViewModulesCard(modifier: Modifier = Modifier) {
+fun TruckViewModulesCard(onNavigateToModules: () -> Unit, modifier: Modifier = Modifier) {
     Row(modifier = modifier
         .width(330.dp)
         .height(224.dp)
@@ -66,7 +66,7 @@ fun TruckViewModulesCard(modifier: Modifier = Modifier) {
                 )
             }
 
-            GoToModulesButton(onClickListener = { /* TODO: Navegar para tela de módulos */ })
+            GoToModulesButton(onClickListener = onNavigateToModules)
         }
     }
 }
@@ -77,6 +77,6 @@ private fun TruckViewModulesCardPreview() {
     GoogleFontProvider.initialize()
 
     ModTruckTheme {
-        TruckViewModulesCard()
+        TruckViewModulesCard(onNavigateToModules = {})
     }
 }

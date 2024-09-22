@@ -3,6 +3,7 @@ package com.jpnacaratti.modtruck.bluetooth
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.jpnacaratti.modtruck.models.ModuleInfo
 import com.jpnacaratti.modtruck.models.SmartBoxInfo
 import com.jpnacaratti.modtruck.models.TruckInfo
 import com.jpnacaratti.modtruck.ui.viewmodels.TruckViewModel
@@ -29,6 +30,11 @@ class BluetoothReceiver(private val viewModel: TruckViewModel): BroadcastReceive
 
                 viewModel.updateSmartBoxInfo(data)
             }
+            MODULE_INFO_RECEIVED -> {
+                val data = intent.getSerializableExtra(EXTRA_DATA) as ModuleInfo?
+
+                viewModel.updateModuleInfo(data)
+            }
         }
     }
 
@@ -37,5 +43,6 @@ class BluetoothReceiver(private val viewModel: TruckViewModel): BroadcastReceive
         const val TRUCK_INFO_RECEIVED = "TRUCK_INFO_RECEIVED"
         const val EXTRA_DATA = "EXTRA_DATA"
         const val SMARTBOX_INFO_RECEIVED = "SMARTBOX_INFO_RECEIVED"
+        const val MODULE_INFO_RECEIVED = "MODULE_INFO_RECEIVED"
     }
 }

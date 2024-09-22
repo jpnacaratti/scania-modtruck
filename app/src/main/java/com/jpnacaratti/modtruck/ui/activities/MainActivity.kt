@@ -30,6 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.jpnacaratti.modtruck.bluetooth.BluetoothReceiver
 import com.jpnacaratti.modtruck.bluetooth.BluetoothService
+import com.jpnacaratti.modtruck.models.ModuleInfo
 import com.jpnacaratti.modtruck.ui.navigation.BottomBar
 import com.jpnacaratti.modtruck.ui.navigation.BottomNavGraph
 import com.jpnacaratti.modtruck.ui.theme.ModTruckTheme
@@ -92,6 +93,7 @@ class MainActivity : ComponentActivity() {
             addAction(BluetoothReceiver.TRUCK_CONNECTED)
             addAction(BluetoothReceiver.TRUCK_INFO_RECEIVED)
             addAction(BluetoothReceiver.SMARTBOX_INFO_RECEIVED)
+            addAction(BluetoothReceiver.MODULE_INFO_RECEIVED)
         }
 
         registerReceiver(bluetoothReceiver, intentFilter, Context.RECEIVER_NOT_EXPORTED)
