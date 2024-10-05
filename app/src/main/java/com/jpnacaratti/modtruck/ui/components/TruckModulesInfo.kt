@@ -39,6 +39,12 @@ fun TruckModulesInfo(truckViewModel: TruckViewModel, modifier: Modifier = Modifi
             icon = painterResource(R.drawable.engine_sound_module),
             title = "Som do motor",
             value = truckViewModel.engineSoundModule.value.getCommonName()
+        ),
+        ModuleData(
+            module = truckViewModel.oilStatusModule.value,
+            icon = painterResource(R.drawable.oil_icon),
+            title = "Óleo",
+            value = "${truckViewModel.oilStatusModule.value.oilLevel}%"
         )
     )
 

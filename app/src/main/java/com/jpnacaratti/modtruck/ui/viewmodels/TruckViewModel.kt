@@ -10,6 +10,7 @@ import com.jpnacaratti.modtruck.models.ModuleAttribute
 import com.jpnacaratti.modtruck.models.ModuleInfo
 import com.jpnacaratti.modtruck.models.ModuleStats
 import com.jpnacaratti.modtruck.models.ModuleStatusInfo
+import com.jpnacaratti.modtruck.models.OilStatusModule
 import com.jpnacaratti.modtruck.models.SmartBoxInfo
 import com.jpnacaratti.modtruck.models.TruckInfo
 import com.jpnacaratti.modtruck.ui.theme.Green
@@ -31,12 +32,16 @@ class TruckViewModel : ViewModel() {
         MutableStateFlow(BatteryLevelModule(connected = true, batteryLevel = 75, status = ModuleStatus.WARNING))
     val batteryLevelModule: StateFlow<BatteryLevelModule> = _batteryLevelModule.asStateFlow()
 
-    private val _engineSoundModule = MutableStateFlow(EngineSoundModule(connected = true))
+    private val _engineSoundModule = MutableStateFlow(EngineSoundModule(connected = false))
     val engineSoundModule: StateFlow<EngineSoundModule> = _engineSoundModule.asStateFlow()
 
     private val _engineHealthModule =
         MutableStateFlow(EngineHealthModule(connected = false, rpm = 3143, temperature = 91F))
     val engineHealthModule: StateFlow<EngineHealthModule> = _engineHealthModule.asStateFlow()
+
+    private val _oilStatusModule =
+        MutableStateFlow(OilStatusModule(connected = false, oilLevel = 50))
+    val oilStatusModule: StateFlow<OilStatusModule> = _oilStatusModule.asStateFlow()
 
     private val _truckInfo = MutableStateFlow<TruckInfo?>(null)
     val truckInfo: StateFlow<TruckInfo?> = _truckInfo.asStateFlow()
@@ -100,6 +105,9 @@ class TruckViewModel : ViewModel() {
             ModuleName.ENGINE_HEALTH.name -> {
                 updateEngineHealthModule(moduleInfo.info.split(";")[0].toInt(), moduleInfo.info.split(";")[1].toFloat())
             }
+            ModuleName.OIL_STATUS.name -> {
+                updateOilStatusModule(moduleInfo.info.toInt())
+            }
         }
     }
 
@@ -115,6 +123,22 @@ class TruckViewModel : ViewModel() {
         _batteryLevelModule.value = BatteryLevelModule(
             connected = true,
             batteryLevel = value,
+            status = status
+        )
+    }
+
+    private fun updateOilStatusModule(value: Int) {
+        var status = ModuleStatus.OK
+        if (value <= 70) {
+            status = ModuleStatus.WARNING
+        }
+        if (value <= 30) {
+            status = ModuleStatus.ERROR
+        }
+
+        _oilStatusModule.value = OilStatusModule(
+            connected = true,
+            oilLevel = value,
             status = status
         )
     }
@@ -172,7 +196,8 @@ class TruckViewModel : ViewModel() {
         return listOf(
             batteryLevelModule.value.connected,
             engineSoundModule.value.connected,
-            engineHealthModule.value.connected
+            engineHealthModule.value.connected,
+            oilStatusModule.value.connected
         ).count { it }
     }
 
@@ -193,7 +218,8 @@ class TruckViewModel : ViewModel() {
         val statuses = listOf(
             batteryLevelModule.value.status,
             engineSoundModule.value.status,
-            engineHealthModule.value.status
+            engineHealthModule.value.status,
+            oilStatusModule.value.status
         )
 
         return when {
@@ -207,7 +233,8 @@ class TruckViewModel : ViewModel() {
         val statuses = listOf(
             batteryLevelModule.value.status,
             engineSoundModule.value.status,
-            engineHealthModule.value.status
+            engineHealthModule.value.status,
+            oilStatusModule.value.status
         )
 
         return when {
@@ -240,6 +267,27 @@ class TruckViewModel : ViewModel() {
                 statusLevel = status.messageLevel,
                 statusDescription = status.description,
                 attributes = getBatteryModuleAttributes()
+            )
+
+            toR.add(stats)
+        }
+
+        if (oilStatusModule.value.connected) {
+            val information =
+                "Esse módulo tem como objetivo medir o nível do óleo dentro do caminhão Scania."
+
+            val status = getOilStatusInfo()
+
+            val stats = ModuleStats(
+                icon = R.drawable.oil_icon,
+                title = "Óleo",
+                showDescription = "${oilStatusModule.value.oilLevel}%",
+                information = information,
+                statusIcon = status.icon,
+                statusIconColor = status.iconColor,
+                statusLevel = status.messageLevel,
+                statusDescription = status.description,
+                attributes = getOilModuleAttributes()
             )
 
             toR.add(stats)
@@ -311,6 +359,27 @@ class TruckViewModel : ViewModel() {
         }
     }
 
+    private fun getOilStatusInfo(): ModuleStatusInfo {
+        return when (batteryLevelModule.value.status) {
+            ModuleStatus.ERROR -> ModuleStatusInfo(
+                icon = R.drawable.icon_error,
+                iconColor = Red,
+                messageLevel = "Atenção: ",
+                description = "Nível do óleo extremamente baixo!"
+            )
+
+            ModuleStatus.WARNING -> ModuleStatusInfo(
+                icon = R.drawable.icon_warning,
+                iconColor = Yellow
+            )
+
+            else -> ModuleStatusInfo(
+                icon = R.drawable.icon_check,
+                iconColor = Green
+            )
+        }
+    }
+
     private fun getEngineSoundStatusInfo(): ModuleStatusInfo {
         return when (engineSoundModule.value.status) {
             ModuleStatus.WARNING -> ModuleStatusInfo(
@@ -354,6 +423,15 @@ class TruckViewModel : ViewModel() {
             ModuleAttribute(
                 attribute = "Bateria: ",
                 value = "${batteryLevelModule.value.batteryLevel}%"
+            )
+        )
+    }
+
+    private fun getOilModuleAttributes(): List<ModuleAttribute> {
+        return listOf(
+            ModuleAttribute(
+                attribute = "Nível do óleo: ",
+                value = "${oilStatusModule.value.oilLevel}%"
             )
         )
     }
