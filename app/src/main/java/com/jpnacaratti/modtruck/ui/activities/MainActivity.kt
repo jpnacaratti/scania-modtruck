@@ -1,11 +1,15 @@
 package com.jpnacaratti.modtruck.ui.activities
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.KeyEvent
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -42,6 +46,7 @@ import com.jpnacaratti.modtruck.utils.UserPreferences
 
 class MainActivity : ComponentActivity() {
 
+    private val handler = Handler(Looper.getMainLooper())
     private lateinit var bluetoothReceiver: BluetoothReceiver
     private lateinit var bluetoothService: BluetoothService
     private val truckViewModel by viewModels<TruckViewModel>()
@@ -84,6 +89,27 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         bluetoothService.stopService()
+    }
+
+    @SuppressLint("RestrictedApi")
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_DOWN) {
+            when (event.keyCode) {
+                KeyEvent.KEYCODE_VOLUME_UP -> {
+                    handler.postDelayed({
+                        truckViewModel.updateModuleInfo(ModuleInfo(module = "ENGINE_SOUND", info = "WARNING"))
+                    }, 6000)
+                    return true
+                }
+                KeyEvent.KEYCODE_VOLUME_DOWN -> {
+                    handler.postDelayed({
+                        truckViewModel.updateModuleInfo(ModuleInfo(module = "ENGINE_SOUND", info = "OK"))
+                    }, 6000)
+                    return true
+                }
+            }
+        }
+        return super.dispatchKeyEvent(event)
     }
 
     private fun registerBluetoothReceiver() {
