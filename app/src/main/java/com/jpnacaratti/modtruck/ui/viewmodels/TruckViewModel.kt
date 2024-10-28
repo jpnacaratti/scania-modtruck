@@ -97,21 +97,25 @@ class TruckViewModel : ViewModel() {
 
         when(moduleInfo.module) {
             ModuleName.BATTERY_LEVEL.name -> {
-                updateBatteryLevelModule(moduleInfo.info.toInt())
+                updateBatteryLevelModule(moduleInfo.info)
             }
             ModuleName.ENGINE_SOUND.name -> {
-                updateSoundModule(ModuleStatus.valueOf(moduleInfo.info))
+                updateSoundModule(moduleInfo.info)
             }
             ModuleName.ENGINE_HEALTH.name -> {
-                updateEngineHealthModule(moduleInfo.info.split(";")[0].toInt(), moduleInfo.info.split(";")[1].toFloat())
+                updateEngineHealthModule(moduleInfo.info)
             }
             ModuleName.OIL_STATUS.name -> {
-                updateOilStatusModule(moduleInfo.info.toInt())
+                updateOilStatusModule(moduleInfo.info)
             }
         }
     }
 
-    private fun updateBatteryLevelModule(value: Int) {
+    private fun updateBatteryLevelModule(info: String?) {
+        if (info.isNullOrEmpty()) return
+
+        val value = info.toIntOrNull() ?: return
+
         var status = ModuleStatus.OK
         if (value <= 70) {
             status = ModuleStatus.WARNING
@@ -127,7 +131,11 @@ class TruckViewModel : ViewModel() {
         )
     }
 
-    private fun updateOilStatusModule(value: Int) {
+    private fun updateOilStatusModule(info: String?) {
+        if (info.isNullOrEmpty()) return
+
+        val value = info.toIntOrNull() ?: return
+
         var status = ModuleStatus.OK
         if (value <= 70) {
             status = ModuleStatus.WARNING
@@ -143,14 +151,27 @@ class TruckViewModel : ViewModel() {
         )
     }
 
-    private fun updateSoundModule(status: ModuleStatus) {
+    private fun updateSoundModule(info: String?) {
+        if (info.isNullOrEmpty()) return
+
+        val status = ModuleStatus.valueOf(info)
+
         _engineSoundModule.value = EngineSoundModule(
             connected = true,
             status = status
         )
     }
 
-    private fun updateEngineHealthModule(rpm: Int, temperature: Float) {
+    private fun updateEngineHealthModule(info: String?) {
+        if (info.isNullOrEmpty()) return
+
+        val split = info.split(";")
+
+        if (split.size != 2) return
+
+        val rpm = split[0].toInt()
+        val temperature = split[1].toFloat()
+
         val cache = EngineHealthModule(
             rpm = rpm,
             temperature = temperature
